@@ -14,7 +14,6 @@ let
   keys = {
     diego = "~/.ssh/keys/id_ed25519";
     git = "~/.ssh/keys/git_ed25519";
-    work = "~/.ssh/keys/work_ed25519";
   };
 
   allKeys = keys // config.custom.ssh.extraKeys;
@@ -75,14 +74,6 @@ in
       "github.com" = {
         User = "git";
         IdentityFile = keys.git;
-      };
-
-      "bitbucket.org" = {
-        IdentityFile = keys.work;
-      };
-
-      "*.teleport.sh" = {
-        IdentityFile = keys.work;
       };
 
       amatista = {
