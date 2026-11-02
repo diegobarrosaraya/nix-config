@@ -17,17 +17,27 @@ let
     work = "~/.ssh/keys/work_ed25519";
   };
 
+  allKeys = keys // config.custom.ssh.extraKeys;
+
   hasSystemd = pkgs.stdenv.hostPlatform.isLinux && !(isNixOnDroid || pkgs.stdenv.hostPlatform.isAndroid or false);
 
   addAllScript = pkgs.writeShellScript "ssh-add-all" (
     concatStringsSep "\n" (
       mapAttrsToList (name: path: ''
         ${pkgs.openssh}/bin/ssh-add ${path} >/dev/null 2>&1 || true
-      '') keys
+      '') allKeys
     )
   );
 in
 {
+  # Lets a private module add key files to the agent without naming them in this public repo.
+  options.custom.ssh.extraKeys = lib.mkOption {
+    type = lib.types.attrsOf lib.types.str;
+    default = { };
+    description = "Extra key name to private key path, loaded into the agent at login.";
+  };
+
+  config = {
   programs.ssh = {
     enable = true;
 
@@ -115,9 +125,10 @@ in
 
   programs.nushell.extraConfig = ''
     def ssh-add-all [] {
-    ${concatStringsSep "\n" (mapAttrsToList (name: path: "    ssh-add ${path}") keys)}
+    ${concatStringsSep "\n" (mapAttrsToList (name: path: "    ssh-add ${path}") allKeys)}
     }
   '';
+  };
 }
 ;
 }
