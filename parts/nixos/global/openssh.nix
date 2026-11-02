@@ -7,11 +7,7 @@ let
   prefix = "";
   pubKey = host: builtins.toPath (../../../hosts/${host}/ssh_host_ed25519_key.pub);
 
-  authorizedKeys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOXblym20SD75es2z5Qay0mfW+g2zvKPBVMsUFakIyBK diegobarrosaraya@outlook.com"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIpXSRXYbg97jxtfnnitIgNQLvGnLgZBWE9079qD2U4C diego@lazulita"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2hEBu4cWTnBMbGdu2bG+sAZu5kBMtc75NFhShmX21"
-  ];
+  authorizedKeys = (import ../../_ssh-keys.nix).authorized;
 in {
   services.openssh = {
     enable = true;

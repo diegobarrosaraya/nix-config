@@ -24,9 +24,6 @@
         "grafito" = {
           id = "2MTBMQE-KIQHZKH-PMVOYUO-FWB4LL2-ASNEJQA-C3THXSO-IU5EBYV-DB3N3AB";
         };
-        "lonsdaleita" = {
-          id = "5SMKMOV-TXWSXW7-4L3PHZ6-6DKMXS4-SSOFD2Y-JJ4RXQ5-WY7JT3F-VI4ARAK";
-        };
 
       };
       folders = {

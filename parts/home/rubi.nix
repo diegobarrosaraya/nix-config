@@ -12,6 +12,8 @@
       ...
     }:
     {
+      custom.git.signingKey = "~/.ssh/keys/git_ed25519.pub";
+
       colorscheme.mode = "dark";
       colorscheme.type = "material-darker";
       colorscheme.iconFolderColor = "black";
