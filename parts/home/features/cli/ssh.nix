@@ -13,7 +13,7 @@ let
 
   keys = {
     diego = "~/.ssh/keys/id_ed25519";
-    github = "~/.ssh/keys/github_ed25519";
+    git = "~/.ssh/keys/git_ed25519";
     work = "~/.ssh/keys/work_ed25519";
   };
 
@@ -45,17 +45,17 @@ in
         HostName = "100.69.115.53";
         IdentityFile = keys.diego;
       };
-      "rubi lonsdaleita *.mineral.network" = {
+      "rubi *.mineral.network" = {
         IdentityFile = keys.diego;
       };
 
-      infinix = {
+      jade = {
         HostName = "192.168.1.36";
         Port = 8022;
         User = "nix-on-droid";
         IdentityFile = keys.diego;
       };
-      infinix-usb = {
+      jade-usb = {
         HostName = "127.0.0.1";
         Port = 8022;
         User = "nix-on-droid";
@@ -64,7 +64,7 @@ in
 
       "github.com" = {
         User = "git";
-        IdentityFile = keys.github;
+        IdentityFile = keys.git;
       };
 
       "bitbucket.org" = {

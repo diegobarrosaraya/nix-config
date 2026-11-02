@@ -142,9 +142,7 @@ content = {
       enable = true;
       port = 2222;
       hostKeys = [ "/nix/persist/etc/ssh/ssh_host_ed25519_key" ];
-      authorizedKeys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2hEBu4cWTnBMbGdu2bG+sAZu5kBMtc75NFhShmX21"
-      ];
+      authorizedKeys = (import ../../../_ssh-keys.nix).initrd;
     };
   };
 

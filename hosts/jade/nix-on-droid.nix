@@ -75,11 +75,7 @@
         exec ${pkgs.openssh}/bin/sshd -D -e -p "$SSHD_PORT" -f "$HOME/.ssh/sshd_config"
       '';
 
-      authorizedKeys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOXblym20SD75es2z5Qay0mfW+g2zvKPBVMsUFakIyBK diegobarrosaraya@outlook.com"
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIpXSRXYbg97jxtfnnitIgNQLvGnLgZBWE9079qD2U4C diego@lazulita"
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2hEBu4cWTnBMbGdu2bG+sAZu5kBMtc75NFhShmX21"
-      ];
+      authorizedKeys = (import ../../parts/_ssh-keys.nix).authorized;
     in
     {
       imports = [

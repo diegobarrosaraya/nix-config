@@ -1,6 +1,6 @@
 # nix-config
 
-Public flake for Diego's machines: cobalto (server), rubi (desktop), infinix (nix-on-droid). It uses flake-parts
+Public flake for Diego's machines: cobalto (server), rubi (desktop), jade (nix-on-droid). It uses flake-parts
 with the dendritic pattern. This file is the source of truth for coding agents. Read it before you change anything.
 
 ## Layout

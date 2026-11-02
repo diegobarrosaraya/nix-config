@@ -37,7 +37,7 @@
       user = {
 
         name = "DiegoBarrosA";
-        email = "diegobarrosaraya@outlook.com";
+        email = "git@diegobarrosaraya.com";
       };
       init = {
         feature.manyFiles = true;

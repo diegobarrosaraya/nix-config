@@ -50,9 +50,6 @@
         "jade" = {
           id = "TB4RVRK-FGAN262-IFIOVLA-HDQQCHS-OXVFYXC-TJNLGYC-TXEOISC-QIRK7A2";
         };
-        "lonsdaleita" = {
-          id = "5SMKMOV-TXWSXW7-4L3PHZ6-6DKMXS4-SSOFD2Y-JJ4RXQ5-WY7JT3F-VI4ARAK";
-        };
 
       };
 

@@ -1,8 +1,8 @@
 { config, inputs, ... }:
 {
-  flake.nixOnDroidConfigurations.infinix = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
+  flake.nixOnDroidConfigurations.jade = inputs.nix-on-droid.lib.nixOnDroidConfiguration {
     pkgs = config.flake.legacyPackages.aarch64-linux;
-    modules = [ ../../hosts/infinix/nix-on-droid.nix ];
+    modules = [ ../../hosts/jade/nix-on-droid.nix ];
     home-manager-path = inputs.home-manager.outPath;
     extraSpecialArgs = {
       inherit inputs;
