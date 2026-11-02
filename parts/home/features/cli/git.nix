@@ -1,14 +1,27 @@
 { ... }:
 {
   flake.modules.homeManager.cli-git =
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
-  programs.git = {
+  # Signing needs the key in the agent, so only hosts that hold the git key set this.
+  options.custom.git.signingKey = lib.mkOption {
+    type = lib.types.nullOr lib.types.str;
+    default = null;
+    description = "Public key file used to sign commits over ssh. Null leaves signing off.";
+  };
+
+  config.programs.git = {
     enable = true;
     package = pkgs.gitFull;
-    signing = {
-      format = null;
-    };
+    signing =
+      if config.custom.git.signingKey == null then
+        { format = null; }
+      else
+        {
+          format = "ssh";
+          key = config.custom.git.signingKey;
+          signByDefault = true;
+        };
 
     ignores = [
       ".direnv"
