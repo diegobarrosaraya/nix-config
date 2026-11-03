@@ -36,12 +36,6 @@
     desktop-devices
     desktop-desktop-common
 
-    # opencode-server option definitions only (enable left at its default
-    # false here); the private work module below sets secretEnv on this
-    # option, so the module must stay imported even though rubi doesn't
-    # run the server itself.
-    ai-opencode-server
-
     # shortcut: the two extra `imports` levels put this module at the same
     # module-tree depth as a flake.modules.* reference, which keeps
     # environment.systemPackages merging in the pre-dendritic order (verified

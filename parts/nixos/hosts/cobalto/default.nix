@@ -76,7 +76,6 @@
     media-po-token-server
     apps-bookorbit
 
-    ai-opencode-server
     ai-hermes-agent
     ai-hermes-profiles
     ai-litellm
@@ -336,13 +335,6 @@
   };
 
   services.po-token-server.enable = true;
-
-  services.opencode-server = {
-    enable = true;
-    host = "127.0.0.1";
-    port = 4096;
-    passwordFile = config.sops.secrets."opencode-server-password".path;
-  };
 
   backups.restic = {
     enable = true;

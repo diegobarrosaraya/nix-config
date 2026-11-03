@@ -271,10 +271,6 @@ in
         };
       };
 
-      "opencode.minerales.network" = withSSL "opencode" {
-        locations."/" = standardProxy 4096;
-      };
-
       # Agent with shell access: LAN and tailnet only, on top of the dashboard
       # login. Ports 80/443 are open on the firewall, so do not rely on DNS.
       "hermes.minerales.network" = withSSL "hermes" {
