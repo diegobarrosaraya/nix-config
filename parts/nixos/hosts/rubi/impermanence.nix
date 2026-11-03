@@ -103,8 +103,6 @@
 
   boot.initrd.supportedFilesystems = [ "btrfs" ];
 
-  boot.initrd.systemd.enable = true;
-
   boot.initrd.systemd.services.wipe-root = {
     description = "Wipe root subvolume and restore from blank snapshot";
     wantedBy = [ "initrd.target" ];
