@@ -46,8 +46,6 @@
     network-syncthing
     apps-couchdb
 
-    ai-open-webui
-
     media-prowlarr
     media-sonarr
     media-radarr

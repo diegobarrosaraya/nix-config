@@ -185,12 +185,6 @@ in
       "llm.minerales.network" = withSSL "llm" {
         locations = {
 
-          # open-webui; moved off 8080 to avoid clashing with qbittorrent.
-          "/" = {
-            proxyPass = "http://localhost:8088";
-            proxyWebsockets = true;
-          };
-
           "/v1/" = {
             proxyPass = "http://localhost:11435/v1/";
             proxyWebsockets = true;

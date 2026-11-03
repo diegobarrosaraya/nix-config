@@ -85,13 +85,6 @@
     noto-fonts-color-emoji = prev.noto-fonts-monochrome-emoji;
   }) ];
 
-  nixpkgs.config = {
-    allowBroken = false;
-    problems.handlers = {
-      posthog.broken = "warn";
-    };
-  };
-
   nix = {
     registry = lib.mapAttrs (_: value: { flake = value; }) (
       lib.filterAttrs (name: _: name != "private-config") inputs
@@ -125,7 +118,7 @@
   # stalls the desktop under pressure.
   systemd.oomd = {
     enable = true;
-    enableUserServices = true;
+    enableUserSlices = true;
   };
 
   environment.systemPackages = with pkgs; [

@@ -50,7 +50,6 @@ in
       antigravity-cli
       herdr
 
-      aider-chat
       llm
       claude-monitor
     ]

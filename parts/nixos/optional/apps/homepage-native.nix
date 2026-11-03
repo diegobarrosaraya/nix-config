@@ -222,13 +222,6 @@
               description = "Vulkan-accelerated LLM server";
             };
           }
-          {
-            "Open-WebUI" = {
-              icon = "mdi-chat-processing";
-              href = "https://llm.minerales.network";
-              description = "LLM chat interface";
-            };
-          }
         ];
       }
       {
