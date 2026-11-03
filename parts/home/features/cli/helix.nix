@@ -42,7 +42,7 @@ in
       nil
       vscode-langservers-extracted
       rust-analyzer
-      ltex-ls
+      ltex-ls-plus
     ];
     themes.stylix-override = pkgs.writeText "stylix-override.toml" ''
       inherits = "stylix"
@@ -138,7 +138,7 @@ in
           };
         };
 
-        ltex-ls.command = "ltex-ls";
+        ltex-ls.command = "ltex-ls-plus";
         markdown-oxide = {
           command = "${pkgs.markdown-oxide}/bin/markdown-oxide";
         };
