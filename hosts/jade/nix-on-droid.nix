@@ -14,11 +14,12 @@
     termux-open-url.enable = true;
   };
 
+  # No pkgs.git here: home-manager's cli-git feature already installs gitFull,
+  # and two gits collide in the nix-on-droid buildEnv path.
   environment.packages = [
     pkgs.llama-cpp-vulkan
     pkgs.curl
     pkgs.jq
-    pkgs.git
     pkgs.ripgrep
     pkgs.openssh
   ];
