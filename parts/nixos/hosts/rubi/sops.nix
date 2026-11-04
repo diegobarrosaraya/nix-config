@@ -59,6 +59,13 @@ with lib;
       mode = "0400";
     };
 
+    # Copy of cobalto's LiteLLM key, for opencode and pi on rubi.
+    secrets."litellm-master-key" = {
+      owner = "diego";
+      group = "users";
+      mode = "0400";
+    };
+
     secrets."couchdb-admin-password" = {
       owner = "diego";
       group = "users";

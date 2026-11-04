@@ -11,7 +11,15 @@
       privateConfig ? { },
       ...
     }:
+    let
+      litellmFree = import ./features/ai/_litellm-free.nix {
+        inherit lib;
+        url = "http://cobalto:4000/v1";
+      };
+    in
     {
+      home.file = litellmFree.pi;
+
       custom.git.signingKey = "~/.ssh/keys/git_ed25519.pub";
 
       colorscheme.mode = "dark";
@@ -105,7 +113,9 @@
             "zennotes"
           ];
 
-          config = {
+          # The LiteLLM free pool on cobalto (same as Hermes) replaces big-pickle
+          # as the default on every agent; the other providers stay selectable.
+          config = lib.recursiveUpdate {
             model = "opencode/big-pickle";
             small_model = "opencode/big-pickle";
 
@@ -211,7 +221,7 @@
               "github_*" = false;
               "playwright_*" = false;
             };
-          };
+          } litellmFree.opencode;
         };
 
         # Dispatcher maps profile to script

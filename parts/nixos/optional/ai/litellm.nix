@@ -21,7 +21,9 @@ in
   # that must survive a reboot.
   services.litellm = {
     enable = true;
-    host = "127.0.0.1";
+    # All interfaces so rubi reaches it over Tailscale. Port 4000 is not in
+    # allowedTCPPorts, so the firewall only lets it in on tailscale0 (trusted).
+    host = "0.0.0.0";
     port = 4000;
     environmentFile = config.sops.templates."litellm.env".path;
     settings = {
@@ -63,7 +65,9 @@ in
   };
 
   sops.secrets = {
-    "litellm-master-key" = { };
+    # diego's opencode and pi read it to call the pool (parts/home/{cobalto,rubi}.nix).
+    # rubi holds a copy of the same value in its own secrets.yaml.
+    "litellm-master-key".owner = "diego";
     "gemini-api-key" = { };
     "openrouter-api-key" = { };
     "groq-api-key" = { };
