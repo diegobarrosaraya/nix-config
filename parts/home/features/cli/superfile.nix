@@ -3,7 +3,12 @@
   flake.modules.homeManager.cli-superfile =
     { config, ... }:
     let
-      c = config.lib.stylix.colors.withHashtag;
+      # Stylix palette on desktops, the standalone colorscheme module where
+      # stylix is not loaded (e.g. nix-on-droid). Both are mkSchemeAttrs.
+      hasStylix = config.lib ? stylix;
+      palette = if hasStylix then config.lib.stylix.colors else config.colorscheme.colors;
+      c = palette.withHashtag;
+      polarity = if hasStylix then config.stylix.polarity else config.colorscheme.mode;
     in
     {
       programs.superfile = {
@@ -30,7 +35,7 @@
 
         # Stylix has no superfile target, so build the theme from its palette.
         themes.stylix = {
-          code_syntax_highlight = if config.stylix.polarity == "light" then "github" else "monokai";
+          code_syntax_highlight = if polarity == "light" then "github" else "monokai";
 
           full_screen_fg = c.base05;
           full_screen_bg = c.base00;
