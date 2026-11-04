@@ -379,6 +379,18 @@ in
         want '^Azogue bot$' hermes-personal; not 'Co-Authored-By: Azogue' hermes-personal
         commit f https://github.com/acme/x /dev/null
         want '^Hermes$' hermes-work
+
+        # lock-bump-guard: a bump with another file staged is refused; the
+        # same bump committed by path goes through and leaves the file staged.
+        git init -q g && cd g && git remote add origin https://github.com/diegobarrosaraya/x
+        export GIT_CONFIG_GLOBAL=$HOME/diego.gitconfig
+        c() { git -c commit.gpgsign=false commit -q "$@"; }
+        echo 1 > flake.lock && echo 1 > other.nix && git add . && c -m init
+        echo 2 > flake.lock && echo 2 > other.nix && git add .
+        if c -m "chore: bump x" 2>/dev/null; then echo "FAIL guard: swept commit allowed"; exit 1; fi
+        c -m "chore: bump x" -- flake.lock || { echo "FAIL guard: path commit refused"; exit 1; }
+        [ "$(git diff --cached --name-only)" = other.nix ] || { echo "FAIL guard: other.nix not left staged"; exit 1; }
+        c -m "feat: other" || { echo "FAIL guard: normal commit refused"; exit 1; }
         touch "$out"
       '';
 }

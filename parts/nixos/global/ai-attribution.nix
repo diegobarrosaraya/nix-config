@@ -17,6 +17,11 @@ let
       event = "commit-msg";
       command = "${hook.script}/bin/ai-attribution-commit-msg";
     };
+    # Same personal repos: a lock-bump commit must not sweep in staged files.
+    hook.lock-bump-guard = {
+      event = "commit-msg";
+      command = lib.getExe (import ../../../pkgs/lock-bump-guard.nix { inherit pkgs; });
+    };
   } // config.custom.aiAttribution.gitConfig));
 
   remotes = lib.concatMap (owner: [
