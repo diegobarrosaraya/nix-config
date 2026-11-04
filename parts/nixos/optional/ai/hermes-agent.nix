@@ -5,6 +5,7 @@
 
 let
   cfg = config.services.hermes-agent;
+  hermesThemes = import ./_hermes-themes.nix { inherit inputs lib pkgs; };
   vault = "/srv/media/Obsidian/obsidiana";
   # Hermes may write only here. The rest of the vault is read-only for it.
   scratch = "${vault}/Hermes";
@@ -188,7 +189,6 @@ in
     # though the backend binds loopback behind nginx. The dashboard also
     # accepts this hostname as the Host header.
     environment.HERMES_DASHBOARD_PUBLIC_URL = "https://hermes.minerales.network";
-    environment.OBSIDIAN_VAULT_PATH = vault;
 
     # Chat runs on the Nous Portal free tier, so the paid OpenCode Go quota is
     # left for coding: Hermes chat emptied the Go weekly window on 2026-10-29.
@@ -237,11 +237,11 @@ in
 
     backend.mode = "dashboard";
 
-    # rubi's two schemes: dashboard themes "colors" and "colors-light" (picked
-    # in the dashboard's palette menu, so dashboard.theme is not set here or a
-    # deploy would undo the choice), and one CLI skin with a light overlay.
-    hermesHomeFiles = import ./_hermes-themes.nix { inherit inputs lib pkgs; };
+    # rubi's two schemes as defaults: the dashboard theme and the CLI skin
+    # each carry dark and light and follow the system or terminal setting.
+    hermesHomeFiles = hermesThemes.files;
     settings.display.skin = "colors";
+    settings.dashboard.theme = "colors";
 
     # GitHub access goes through an MCP server, so the token never enters the
     # agent's shell. Hermes blocks GH_TOKEN and GITHUB_TOKEN from every shell
@@ -255,6 +255,17 @@ in
     # dropped the arguments through that bridge, so GitHub's tools are
     # exposed directly instead. The 1M-token context absorbs the extra schemas.
     settings.tools.tool_search.enabled = "off";
+
+    # The notes vault through ZenNotes, Hermes's second brain. Same server as
+    # diego's tools (`zn mcp`, vault set by custom.notesVault). It runs as the
+    # hermes user on the files, not through the ZenNotes server (which runs as
+    # diego), so the ACLs from hermes-vault-access still limit writes to Hermes/.
+    mcpServers.notes = {
+      command = hmDiego.programs.mcp-config.zennotes.cliPath;
+      args = [ "mcp" ];
+    };
+    # Its bundled obsidian skill reads the vault with file tools instead.
+    settings.skills.disabled = [ "obsidian" ];
 
     mcpServers.github = {
       command = "${pkgs.github-mcp-server}/bin/github-mcp-server";
@@ -315,10 +326,29 @@ in
   # Tells Hermes which coding agents exist. The module installs this into the
   # working directory, where Hermes reads it as project context. Names only, no secrets.
   # workingDirectory is pinned to the module default so `documents` accepts it.
+  # Fonts for the dashboard themes, same-origin because its CSP allows only
+  # 'self' and Google Fonts. Public font files, so no access rules here; the
+  # vhost itself is in minerales-network.nix.
+  services.nginx.virtualHosts."hermes.minerales.network".locations."${hermesThemes.fontPath}/" = {
+    alias = "${hermesThemes.fonts}/";
+    extraConfig = ''
+      expires 30d;
+      add_header Cache-Control "public, immutable";
+    '';
+  };
+
   services.hermes-agent.workingDirectory = "/var/lib/hermes/workspace";
   services.hermes-agent.documents."AGENTS.md" =
     ''
       # Coding agents on this host
+
+      ## Second brain: the notes vault
+
+      - Diego's notes vault is your knowledge base. Use the `notes` MCP (ZenNotes) for it: search
+        it before you ask Diego, and read the project notes before you start work.
+      - Do not read the vault with file tools or the shell. Use the `notes` tools.
+      - You can write only under `Hermes/`. Every other folder is read-only for you. Put new notes
+        and findings there, and tell Diego which note you wrote.
 
       ## Rules for code work (read first)
 

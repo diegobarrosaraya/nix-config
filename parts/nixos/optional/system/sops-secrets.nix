@@ -101,12 +101,6 @@ with lib;
       mode = "0640";
     };
 
-    secrets."obsidian-api-key" = {
-      owner = "diego";
-      group = "users";
-      mode = "0400";
-    };
-
     secrets."vaultwarden-admin-token" = {
       owner = "root";
       group = "root";

@@ -32,6 +32,10 @@ in
     ai
   ];
 
+  # The vault ZenNotes serves here (services.zennotes). Hermes's agents copy
+  # diego's MCP set, so they read the same vault, as the hermes user.
+  custom.notesVault = "/srv/media/Obsidian/obsidiana";
+
   programs.opencode-config = {
     enable = true;
     opencodeGo.enable = true;
@@ -111,8 +115,12 @@ in
         system = pkgs.stdenv.hostPlatform.system;
         config.allowUnfree = true;
       }).claude-agent-acp;
+    # Work profiles keep their own MCP set from the private repo, plus the
+    # notes vault, which holds the work project notes too.
     profiles =
-      (privateConfig.workClaudeProfiles or { })
+      lib.mapAttrs (_: p: lib.recursiveUpdate p {
+        mcpServers = { inherit (config.programs.mcp-config.standardFormat.mcpServers) notes; };
+      }) (privateConfig.workClaudeProfiles or { })
       // {
         personal.tokenFile = "/run/secrets/claude-token-personal";
       };

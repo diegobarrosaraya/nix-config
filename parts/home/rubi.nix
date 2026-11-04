@@ -46,6 +46,8 @@
       home.packages = [
         customPkgs.coderabbit-cli
         customPkgs.ekphos
+        pkgs.zennotes-desktop
+        customPkgs.zennotes-cli
         pkgs.insync
         pkgs.nodejs_24
       ];
@@ -72,10 +74,20 @@
 
       programs.nushell.shellAliases.hermes-cobalto = "ssh -t cobalto sudo -u hermes /run/current-system/sw/bin/hermes-tui";
 
-      programs.obsidian = {
-        enable = true;
-        vaults.Notes.target = "Notes";
-      };
+      # ZenNotes replaced Obsidian. Home-manager's Obsidian module linked four
+      # files into ~/Notes/.obsidian. Dropping the module would delete them, and
+      # Syncthing would carry the deletion to cobalto and grafito, so they are
+      # turned into plain copies first; home-manager only removes its own links.
+      # shortcut: one-time migration, delete after rubi has switched once.
+      home.activation.keepObsidianVaultFiles = lib.hm.dag.entryBefore [ "linkGeneration" ] ''
+        for f in app.json appearance.json community-plugins.json "snippets/Stylix Config.css"; do
+          p="$HOME/Notes/.obsidian/$f"
+          if [ -L "$p" ] && [[ "$(readlink "$p")" == /nix/store/* ]]; then
+            run cp --remove-destination "$(readlink -f "$p")" "$p"
+            run chmod u+w "$p"
+          fi
+        done
+      '';
 
       gtk.gtk3.bookmarks = [
         "file://${config.home.homeDirectory}/Documents"
@@ -114,7 +126,7 @@
             "nixos"
             "github"
             "playwright"
-            "zennotes"
+            "notes"
           ];
 
           # big-pickle stays the default: this profile also loads work config, and

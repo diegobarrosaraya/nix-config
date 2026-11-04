@@ -34,9 +34,9 @@
         };
         "4" = {
           name = "Notes";
-          app = "md.obsidian.Obsidian";
+          app = "ZenNotes";
           key = "n";
-          launch = "obsidian";
+          launch = "zennotes-desktop";
         };
       };
 
@@ -105,7 +105,7 @@
           "Mod4+Shift+e          power menu" \
           "Mod4+Escape           lock" \
           "Mod4+1..0             go to workspace number" \
-          "Mod4+f/e/a/n          launch or focus: Web (zen)/Files (superfile)/Agents (zellij)/Notes (obsidian)" \
+          "Mod4+f/e/a/n          launch or focus: Web (zen)/Files (superfile)/Agents (zellij)/Notes (zennotes)" \
           | ${config.launcher.dmenu} --require-match false --prompt-text "keys"
       '';
 

@@ -5,20 +5,34 @@
   config,
   lib,
   pkgs,
+  customPkgs,
   privateConfig ? { },
   ...
 }:
 {
-  programs.mcp-config = {
+  # The vault `zn mcp` serves. A host without the desktop app has no "vault
+  # the app has open" to fall back on, so it is always set explicitly.
+  options.custom.notesVault = lib.mkOption {
+    type = lib.types.str;
+    default = "${config.home.homeDirectory}/Notes";
+    description = "Notes vault exposed to AI tools through the ZenNotes MCP.";
+  };
+
+  config.programs.mcp-config = {
     enable = true;
 
     # Core MCPs (always active, low overhead)
     mcpNixos.enable = true;
 
-    # Defined but off by default (enabled = false); turn on per session.
+    # The notes vault is every tool's second brain, so it is on everywhere.
+    # Each tool's process runs as its own user, so file permissions on the
+    # vault still apply (Hermes's agents can write only to Hermes/).
     zennotes = {
       enable = true;
-      autostart = false;
+      cliPath = "${pkgs.writeShellScript "zn-notes" ''
+        export ZENNOTES_VAULT="''${ZENNOTES_VAULT:-${config.custom.notesVault}}"
+        exec ${customPkgs.zennotes-cli}/bin/zn "$@"
+      ''}";
     };
 
     # Heavy MCPs (tools disabled globally, enabled via subagents)
@@ -58,7 +72,7 @@
   # generation: nushell's `source` needs it at parse time, and a half-run
   # activation used to leave it missing. Content is only secret *paths*, read
   # at shell start, so a store symlink is safe.
-  home.file.".config/nushell/mcp-env.nu" =
+  config.home.file.".config/nushell/mcp-env.nu" =
     let
       mcpPrefixes = [ "WORK_" "JIRA_" "CONFLUENCE_" "JSM_" "TRELLO_" "TEMPO_" ];
       isMcp = name: lib.any (p: lib.hasPrefix p name) mcpPrefixes;

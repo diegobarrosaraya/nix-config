@@ -56,10 +56,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    obsidian-skills = {
-      url = "github:kepano/obsidian-skills";
-      flake = false;
-    };
 
     impeccable = {
       url = "github:pbakaus/impeccable";

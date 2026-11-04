@@ -14,6 +14,10 @@
   programs.claude-code-config.enable = true;
 
   home.packages = [ pkgs.pi-coding-agent ];
+  # pi reads user MCP servers from here (standard format); only the notes vault.
+  home.file.".pi/agent/mcp.json".text = builtins.toJSON {
+    mcpServers = { inherit (config.programs.mcp-config.standardFormat.mcpServers) notes; };
+  };
 
   programs.claude-code-config = {
     # Impeccable agents
@@ -40,17 +44,14 @@
     # Plugins are per profile too, so repeat the default set here.
     personal = {
       inherit (config.programs.claude-code-config) enabledPlugins extraKnownMarketplaces;
+      # Only the notes vault; the profile keeps the rest of its MCP set empty.
+      mcpServers = { inherit (config.programs.mcp-config.standardFormat.mcpServers) notes; };
     };
     sr = {
       # Same MCP set as the default profile (mirrors the module's own merge).
       mcpServers =
         config.programs.mcp-config.standardFormat.mcpServers
         // config.programs.claude-code-config.extraMcpServers;
-      enabledPlugins."obsidian@obsidian-skills" = true;
-      extraKnownMarketplaces."obsidian-skills".source = {
-        source = "github";
-        repo = "kepano/obsidian-skills";
-      };
     };
   };
 
@@ -65,7 +66,6 @@
     enable = true;
 
     extraSkillSources = [
-      "${inputs.obsidian-skills}/skills"
       "${inputs.impeccable}/.claude/skills"
     ];
   };

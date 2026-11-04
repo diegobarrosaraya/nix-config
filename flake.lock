@@ -1027,22 +1027,6 @@
         "type": "github"
       }
     },
-    "obsidian-skills": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1789483437,
-        "narHash": "sha256-kyH07EVmwIEC/q6i91Kz8mPE78j9ITga2NZUpU1+nHU=",
-        "owner": "kepano",
-        "repo": "obsidian-skills",
-        "rev": "3ccff5338ea700537839b21900aa5358a0402c98",
-        "type": "github"
-      },
-      "original": {
-        "owner": "kepano",
-        "repo": "obsidian-skills",
-        "type": "github"
-      }
-    },
     "ponytail": {
       "flake": false,
       "locked": {
@@ -1071,11 +1055,11 @@
         "trello-cloud-mcp": "trello-cloud-mcp"
       },
       "locked": {
-        "lastModified": 1793810375,
-        "narHash": "sha256-rWXwzcRnKZySPhQKlisqyar8QNiB867SwiL7RomneMw=",
+        "lastModified": 1793810783,
+        "narHash": "sha256-yGo6NTcke04GQI3OKSVnfDxyEWKsRP68hLMtoC+4Fug=",
         "ref": "refs/heads/master",
-        "rev": "7e6e17a24a1647fad4e35bebbecfc4163a33654f",
-        "revCount": 149,
+        "rev": "3942a77e1cea8fa9d81ad70a1d2284a74c2150d2",
+        "revCount": 151,
         "type": "git",
         "url": "ssh://git@github.com/diegobarrosaraya/nix-private-config.git"
       },
@@ -1153,7 +1137,6 @@
         "nixpkgs": "nixpkgs_5",
         "nixpkgs-acp": "nixpkgs-acp",
         "nixvirt": "nixvirt",
-        "obsidian-skills": "obsidian-skills",
         "ponytail": "ponytail",
         "private-config": "private-config",
         "sops-nix": "sops-nix",

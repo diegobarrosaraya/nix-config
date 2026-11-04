@@ -68,9 +68,9 @@ let
     };
     "Notes" = {
       icon = "e879";
-      app = "md.obsidian.Obsidian";
+      app = "ZenNotes";
       key = "n";
-      launch = "obsidian";
+      launch = "zennotes-desktop";
       persistent = true;
     };
   };

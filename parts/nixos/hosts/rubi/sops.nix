@@ -39,12 +39,6 @@ with lib;
       mode = "0400";
     };
 
-    secrets."obsidian-api-key" = {
-      owner = "diego";
-      group = "users";
-      mode = "0400";
-    };
-
     secrets."github-token" = {
       owner = "diego";
       group = "users";
