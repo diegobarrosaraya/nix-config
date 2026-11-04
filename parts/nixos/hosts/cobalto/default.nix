@@ -44,7 +44,6 @@
 
     apps-homepage-native
     network-syncthing
-    apps-couchdb
 
     media-prowlarr
     media-sonarr

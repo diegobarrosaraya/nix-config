@@ -211,18 +211,6 @@ in
         locations."/" = standardProxy 8888;
       };
 
-      "sync.minerales.network" = withSSL "sync" {
-        locations."/" = {
-          proxyPass = "http://localhost:5984";
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_buffering off;
-            proxy_read_timeout 600s;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-Host $host;
-          '';
-        };
-      };
 
       "homeassistant.minerales.network" = withSSL "homeassistant" {
         locations."/" = {

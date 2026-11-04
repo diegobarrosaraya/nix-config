@@ -47,26 +47,8 @@ with lib;
       key = "github_token";
     };
 
-    secrets."couchdb-admin-user" = {
-      owner = "diego";
-      group = "users";
-      mode = "0400";
-    };
-
     # Copy of cobalto's LiteLLM key, for opencode and pi on rubi.
     secrets."litellm-master-key" = {
-      owner = "diego";
-      group = "users";
-      mode = "0400";
-    };
-
-    secrets."couchdb-admin-password" = {
-      owner = "diego";
-      group = "users";
-      mode = "0400";
-    };
-
-    secrets."obsidian-livesync-passphrase" = {
       owner = "diego";
       group = "users";
       mode = "0400";

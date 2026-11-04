@@ -37,7 +37,6 @@
 
       "/var/lib/bitwarden_rs"
       "/var/lib/vaultwarden"
-      "/var/lib/couchdb"
       "/var/lib/bazarr"
       "/var/lib/private/open-webui"
       "/var/lib/hermes"
