@@ -113,8 +113,9 @@
             "zennotes"
           ];
 
-          # The LiteLLM free pool on cobalto (same as Hermes) replaces big-pickle
-          # as the default on every agent; the other providers stay selectable.
+          # big-pickle stays the default: this profile also loads work config, and
+          # the LiteLLM free pool on cobalto includes providers that train on
+          # prompts. The pool is added as a provider to pick by hand.
           config = lib.recursiveUpdate {
             model = "opencode/big-pickle";
             small_model = "opencode/big-pickle";
@@ -221,7 +222,7 @@
               "github_*" = false;
               "playwright_*" = false;
             };
-          } litellmFree.opencode;
+          } { inherit (litellmFree.opencode) provider; };
         };
 
         # Dispatcher maps profile to script
