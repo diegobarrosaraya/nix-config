@@ -11,7 +11,15 @@
       privateConfig ? { },
       ...
     }:
+    let
+      litellmFree = import ./features/ai/_litellm-free.nix {
+        inherit lib;
+        url = "http://cobalto:4000/v1";
+      };
+    in
     {
+      home.file = litellmFree.pi;
+
       custom.git.signingKey = "~/.ssh/keys/git_ed25519.pub";
 
       colorscheme.mode = "dark";
@@ -105,7 +113,10 @@
             "zennotes"
           ];
 
-          config = {
+          # big-pickle stays the default: this profile also loads work config, and
+          # the LiteLLM free pool on cobalto includes providers that train on
+          # prompts. The pool is added as a provider to pick by hand.
+          config = lib.recursiveUpdate {
             model = "opencode/big-pickle";
             small_model = "opencode/big-pickle";
 
@@ -211,7 +222,7 @@
               "github_*" = false;
               "playwright_*" = false;
             };
-          };
+          } { inherit (litellmFree.opencode) provider; };
         };
 
         # Dispatcher maps profile to script

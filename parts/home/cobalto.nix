@@ -18,6 +18,12 @@ let
     GITHUB_TOKEN = "/run/secrets/github-token";
   };
 
+  # ai-litellm runs on this host.
+  litellmFree = import ./features/ai/_litellm-free.nix {
+    inherit lib;
+    url = "http://127.0.0.1:4000/v1";
+  };
+
 in
 {
   imports = with top.config.flake.modules.homeManager; [
@@ -31,7 +37,10 @@ in
     opencodeGo.enable = true;
     opencodeZen.enable = true;
     provider.enable = false;
-    extraConfig = (import ./features/ai/_opencode-personal.nix).config;
+    # Personal opencode runs on the LiteLLM "free" pool, the same free tiers Hermes
+    # uses, so the paid Go quota stays for when Diego picks it by hand. Profiles
+    # do not inherit this, so the work profile never reaches the pool.
+    extraConfig = lib.recursiveUpdate (import ./features/ai/_opencode-personal.nix).config litellmFree.opencode;
 
     profiles =
       lib.optionalAttrs ((privateConfig.workProfile or null) != null) {
@@ -129,6 +138,8 @@ in
       antigravity = lib.mapAttrs (_: a: { keyFile = a.tokenFile; }) (accounts.antigravity or { });
     };
 
+
+  home.file = litellmFree.pi;
 
   home.packages = (with pkgs; [
     uv

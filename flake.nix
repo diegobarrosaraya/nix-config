@@ -82,12 +82,12 @@
     nixpkgs-acp.url = "github:nixos/nixpkgs/nixos-unstable";
 
     ai-tooling = {
-      url = "github:DiegoBarrosA/nix-ai-tooling";
+      url = "github:diegobarrosaraya/nix-ai-tooling";
     };
 
     private-config = {
 
-      url = "git+ssh://git@github.com/DiegoBarrosA/nix-private-config.git";
+      url = "git+ssh://git@github.com/diegobarrosaraya/nix-private-config.git";
       flake = true;
     };
 
@@ -110,7 +110,7 @@
     hermes-agent.url = "github:NousResearch/hermes-agent";
 
     teams-calls-fetcher = {
-      url = "github:DiegoBarrosA/teams-calls-fetcher";
+      url = "github:diegobarrosaraya/teams-calls-fetcher";
     };
 
   };
