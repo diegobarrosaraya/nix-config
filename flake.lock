@@ -7,13 +7,13 @@
       "locked": {
         "lastModified": 1793392815,
         "narHash": "sha256-DKgsJEzAKuX1a3Vtcwq85dfBpqOLz8PQSxhDkGSjlzQ=",
-        "owner": "DiegoBarrosA",
+        "owner": "diegobarrosaraya",
         "repo": "nix-ai-tooling",
         "rev": "29f6fd0e0481f70609237382cda8b1886a180c48",
         "type": "github"
       },
       "original": {
-        "owner": "DiegoBarrosA",
+        "owner": "diegobarrosaraya",
         "repo": "nix-ai-tooling",
         "type": "github"
       }
@@ -123,17 +123,17 @@
     "confluence-cloud-mcp": {
       "flake": false,
       "locked": {
-        "lastModified": 1785169694,
-        "narHash": "sha256-z8+xYF2DU7353MLT9CvumJeXX9SddKarwyo7Xk3EggY=",
+        "lastModified": 1793800593,
+        "narHash": "sha256-0pNOnxcT60qc1nElTUOy8B8bdkNNegt4GmfuaJUUUbI=",
         "ref": "refs/heads/main",
-        "rev": "24b758984edbb7ecdcc9c93e5ce71d79e29b1cd4",
-        "revCount": 10,
+        "rev": "1c984b2e4ec141da239377f587d090c05aa5ca02",
+        "revCount": 14,
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/confluence-cloud-mcp.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/confluence-cloud-mcp.git"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/confluence-cloud-mcp.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/confluence-cloud-mcp.git"
       }
     },
     "deploy-rs": {
@@ -427,11 +427,11 @@
         "uv2nix": "uv2nix"
       },
       "locked": {
-        "lastModified": 1793694484,
-        "narHash": "sha256-p8QnDim+plDff2vgiFAXQQaG5KNGUio/NNn8RrDeFZA=",
+        "lastModified": 1793803015,
+        "narHash": "sha256-GmSYbMxpO0aoO9kC/hpnK5hbSHtjdBV55r1gJt4Hb5A=",
         "owner": "NousResearch",
         "repo": "hermes-agent",
-        "rev": "c314285f077e91937c995d419b9fa40af9eb4981",
+        "rev": "785c2e5110eb3fbfc5346fd8370ca96910aaa1f3",
         "type": "github"
       },
       "original": {
@@ -468,11 +468,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793193205,
-        "narHash": "sha256-X6xa6sGA7RnJQuZGbFMC+K+KToWAlBDCCjJXfTwEPsw=",
+        "lastModified": 1793757180,
+        "narHash": "sha256-gyV7AtCwLnOImcrfSETP4J3Ie96bz19DY47B7m7Y3HM=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "095fef2f265c3c0da4fe315efba8f8a04495ab34",
+        "rev": "b787c48e2ec57a9d098f5c2721882a3bc1e16f97",
         "type": "github"
       },
       "original": {
@@ -526,11 +526,11 @@
     "impeccable": {
       "flake": false,
       "locked": {
-        "lastModified": 1793659091,
-        "narHash": "sha256-CuVmyKOPOAoHyrO+NM71kryBcKayM/E6TTX9z6K/QVo=",
+        "lastModified": 1793803173,
+        "narHash": "sha256-6WTP66lMq84Q0Np4uPR/xpTNTGwLh/V0L/0jV5nLhCQ=",
         "owner": "pbakaus",
         "repo": "impeccable",
-        "rev": "9fadc41729c38fd47d7ae622b501558653f9d2e9",
+        "rev": "2c95b1968ca74c5d2c4c0503dcee72f6d0d555ea",
         "type": "github"
       },
       "original": {
@@ -582,11 +582,11 @@
         "rev": "ab965c4099b3fc2e0cb89c5a1ddc85b87af7b412",
         "revCount": 13,
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/jira-cloud-mcp.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/jira-cloud-mcp.git"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/jira-cloud-mcp.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/jira-cloud-mcp.git"
       }
     },
     "jira-data-center-mcp": {
@@ -598,11 +598,11 @@
         "rev": "8af8042fe44a6aa2d6361d99103a03d9bfd819ab",
         "revCount": 8,
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/jira-data-center-mcp.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/jira-data-center-mcp.git"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/jira-data-center-mcp.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/jira-data-center-mcp.git"
       }
     },
     "llm-agents": {
@@ -616,11 +616,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1793708775,
-        "narHash": "sha256-TCztCGO7C7rgg3S4JscvKm4lA5b1R3zy5MPKfYirOHI=",
+        "lastModified": 1793792991,
+        "narHash": "sha256-iwRRrAXTwwL63dt634RWz2ou3p8SIqlkFUKJhS9oGbc=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "a854ddf4456f5fd67474e2d844cb4a29c32702d0",
+        "rev": "6182a0cd6e1ca9fa9de72155dc9bc4335a4f0b8e",
         "type": "github"
       },
       "original": {
@@ -641,11 +641,11 @@
         "rev": "9640dd82b14d75d1ec15a11393d39d73c9632ba5",
         "revCount": 35,
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/netsuite-mcp.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/netsuite-mcp.git"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/netsuite-mcp.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/netsuite-mcp.git"
       }
     },
     "nix-formatter-pack": {
@@ -705,11 +705,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1762090880,
-        "narHash": "sha256-fbRQzIGPkjZa83MowjbD2ALaJf9y6KMDdJBQMKFeY/8=",
+        "lastModified": 1793798159,
+        "narHash": "sha256-c263mBFrDLv2/sguzQeKL99aJ4PkCdcUzcAuA5Cpzjo=",
         "owner": "guibou",
         "repo": "nixGL",
-        "rev": "b6105297e6f0cd041670c3e8628394d4ee247ed5",
+        "rev": "4306ae1d15adf3d386f1462b330d4f2648404711",
         "type": "github"
       },
       "original": {
@@ -736,11 +736,11 @@
     },
     "nixpkgs-acp": {
       "locked": {
-        "lastModified": 1793540411,
-        "narHash": "sha256-fiPJ88izTVucjeo2EQ3jk4aWmLg03I1D4vxnX2QjEgE=",
+        "lastModified": 1793726008,
+        "narHash": "sha256-jQp1wKvbwWdLBASTXkSi/VYmDJ5AbBi1WvcMt9HWJC8=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "0bb2eedc20e4739f29e8045034f2828ad7054f8f",
+        "rev": "1d060086d60cb76a40cf37109f979d88a5bd6396",
         "type": "github"
       },
       "original": {
@@ -1071,17 +1071,17 @@
         "trello-cloud-mcp": "trello-cloud-mcp"
       },
       "locked": {
-        "lastModified": 1793638729,
-        "narHash": "sha256-WXPd+bDDffRvkC/FaEmxm4/nwciGKNkFaqlIzyF1mZ0=",
+        "lastModified": 1793803457,
+        "narHash": "sha256-VqjfeOQKqucWKBndHW2YKIHejZpnz5hQmASton6D+oM=",
         "ref": "refs/heads/master",
-        "rev": "ccc0268d8a69bfdf90438015d24cd5d8ee9c3c9c",
-        "revCount": 141,
+        "rev": "d402759959b8602d07e593e1cd017d0345b1e46c",
+        "revCount": 144,
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/nix-private-config.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/nix-private-config.git"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/nix-private-config.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/nix-private-config.git"
       }
     },
     "pyproject-build-systems": {
@@ -1348,13 +1348,13 @@
       "locked": {
         "lastModified": 1788794643,
         "narHash": "sha256-OuTUWr1HE4WMhmiM/tcBJyp0HSXzRg0J3gL+IQE01Po=",
-        "owner": "DiegoBarrosA",
+        "owner": "diegobarrosaraya",
         "repo": "teams-calls-fetcher",
         "rev": "a06a6b4043bc67faf680ce5973270a810f0cde1c",
         "type": "github"
       },
       "original": {
-        "owner": "DiegoBarrosA",
+        "owner": "diegobarrosaraya",
         "repo": "teams-calls-fetcher",
         "type": "github"
       }
@@ -1364,13 +1364,13 @@
       "locked": {
         "lastModified": 1784898828,
         "narHash": "sha256-3jMdYGL/Fql7P11+hLAkVtjQ8ZR0JVOsTTBnTw8JBCM=",
-        "owner": "DiegoBarrosA",
+        "owner": "diegobarrosaraya",
         "repo": "tempo-mcp-server",
         "rev": "15a9c3a6b5864179bcd9d736068ab0ec22da9824",
         "type": "github"
       },
       "original": {
-        "owner": "DiegoBarrosA",
+        "owner": "diegobarrosaraya",
         "repo": "tempo-mcp-server",
         "type": "github"
       }
@@ -1469,11 +1469,11 @@
         "rev": "973c1d3cb57d45bcf805d8671188e5e16679a4fc",
         "revCount": 7,
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/trello-cloud-mcp.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/trello-cloud-mcp.git"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@github.com/DiegoBarrosA/trello-cloud-mcp.git"
+        "url": "ssh://git@github.com/diegobarrosaraya/trello-cloud-mcp.git"
       }
     },
     "utils": {
@@ -1545,11 +1545,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793710409,
-        "narHash": "sha256-NapxfokR49AvYX5ldtkjrdtH5pWxEj9BXU0Gw+rYX+E=",
+        "lastModified": 1793781856,
+        "narHash": "sha256-5c93tSlnE1VVunrw3/Q75EayZLkMQmoUcNZv/1fXWKU=",
         "owner": "0xc000022070",
         "repo": "zen-browser-flake",
-        "rev": "d87bba54c0ddc367b2801ef5c66eed8b8e0ac072",
+        "rev": "3c9750e20fd25605fbd2f7a71253997cc45838c5",
         "type": "github"
       },
       "original": {
