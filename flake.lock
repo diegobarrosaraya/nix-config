@@ -1162,7 +1162,7 @@
         "teams-calls-fetcher": "teams-calls-fetcher",
         "vital-presets": "vital-presets",
         "zen-browser": "zen-browser",
-        "zennotes": "zennotes"
+        "znserver": "znserver"
       }
     },
     "scss-reset": {
@@ -1558,24 +1558,19 @@
         "type": "github"
       }
     },
-    "zennotes": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
+    "znserver": {
+      "flake": false,
       "locked": {
-        "lastModified": 1788187458,
-        "narHash": "sha256-7CBbdLUYywfaTuea5qSHhQsE6+gQDuZNINCtvw21uFk=",
+        "lastModified": 1793739587,
+        "narHash": "sha256-9n4K2FbXo6x8K0eeAtD7JJvyDE0dR6lqBdSKYTQd3H8=",
         "owner": "ZenNotes",
-        "repo": "zennotes",
-        "rev": "a29bd21f8469754de9c0a0d1fcf6fd657ad3e1ac",
+        "repo": "znserver",
+        "rev": "f4a3d0fae26689d341ab55e5c63e0ea195da2a35",
         "type": "github"
       },
       "original": {
         "owner": "ZenNotes",
-        "repo": "zennotes",
-        "rev": "a29bd21f8469754de9c0a0d1fcf6fd657ad3e1ac",
+        "repo": "znserver",
         "type": "github"
       }
     }
