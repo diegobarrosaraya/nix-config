@@ -3,7 +3,7 @@
   flake.modules.nixos.global = { inputs, outputs, customPkgs ? {}, desktop ? null, ... }: {
   imports = [
     inputs.home-manager.nixosModules.home-manager
-  ] ++ (with config.flake.modules.nixos; [ global-openssh global-locale ]);
+  ] ++ (with config.flake.modules.nixos; [ global-openssh global-locale global-ai-attribution ]);
   networking.domain = "mineral.network";
 
   home-manager.useGlobalPkgs = true;

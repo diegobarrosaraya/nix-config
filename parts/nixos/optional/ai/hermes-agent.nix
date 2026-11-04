@@ -467,13 +467,25 @@ in
   # (no ~/.gitconfig). The helper (see gitAccess above) hands out the personal
   # or work token by host and repo owner. useHttpPath makes git pass the
   # owner/repo path, which the helper needs.
+  # In personal repos Hermes commits as Azogue bot, not under an AI name
+  # (parts/nixos/global/ai-attribution.nix). diego's own ~/.config/git/config
+  # is read after the system file, so his identity still wins for him.
+  custom.aiAttribution.gitConfig.user = {
+    name = "Azogue bot";
+    email = "azogue@minerales.network";
+  };
+
   programs.git = {
     enable = true;
     config = {
-      user = {
-        name = "Hermes";
-        email = "hermes@minerales.network";
-      };
+      # Default identity in an [include], which git reads before the personal
+      # [includeIf] (sections are written sorted), so Azogue wins there. A plain
+      # [user] section sorts last and would override it (checks.ai-attribution-scope).
+      include.path = "${pkgs.writeText "hermes-identity.gitconfig" ''
+        [user]
+        	name = Hermes
+        	email = hermes@minerales.network
+      ''}";
       credential = lib.listToAttrs (
         map (h: lib.nameValuePair "https://${h}" {
           useHttpPath = true;

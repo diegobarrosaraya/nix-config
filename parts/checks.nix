@@ -314,4 +314,71 @@ in
       [ -z "$got" ] || { echo "FAIL: denied profile printed '$got'"; exit 1; }
       touch "$out"
     '';
+
+  # AI credit is stripped, Azogue is added once for agent commits only, and
+  # human trailers and human commits stay as written.
+  flake.checks.x86_64-linux.ai-attribution-hook =
+    let
+      hook = import ../pkgs/ai-attribution-hook.nix { inherit pkgs; };
+    in
+    pkgs.runCommand "ai-attribution-hook" { nativeBuildInputs = [ pkgs.git ]; } ''
+      export HOME=$TMPDIR GIT_AUTHOR_NAME=Diego GIT_AUTHOR_EMAIL=d@example.com
+      git init -q repo && cd repo
+      run() { printf '%b' "$2" > m; env $1 ${hook.script}/bin/ai-attribution-commit-msg m; }
+      azogues() { grep -c 'Azogue bot' m || true; }
+      fail() { echo "FAIL: $1"; cat m; exit 1; }
+
+      run X=1 'fix: a\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/x\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n'
+      grep -qiE 'claude|generated' m && fail "AI credit kept"
+      [ "$(azogues)" = 1 ] || fail "stripped commit lacks Azogue"
+
+      run CLAUDECODE=1 'fix: b\n\n${hook.trailer}\n'
+      [ "$(azogues)" = 1 ] || fail "Azogue duplicated"
+
+      run PI_CODING_AGENT=true 'fix: c\n\nCo-authored-by: Ana <ana@example.com>\nSigned-off-by: Diego <d@example.com>\n'
+      grep -q 'Ana' m && grep -q 'Signed-off-by: Diego' m || fail "human trailer removed"
+      [ "$(azogues)" = 1 ] || fail "agent shell commit lacks Azogue"
+
+      run X=1 'fix: d\n\nSigned-off-by: Diego <d@example.com>\n'
+      [ "$(azogues)" = 0 ] || fail "human commit got Azogue"
+
+      GIT_AUTHOR_EMAIL=azogue@minerales.network run CLAUDECODE=1 'fix: e\n'
+      [ "$(azogues)" = 0 ] || fail "Azogue as author got itself as co-author"
+      touch "$out"
+    '';
+
+  # The hook and Hermes's Azogue identity apply in personal repos only, through
+  # cobalto's real /etc/gitconfig. Work repos keep tool defaults.
+  flake.checks.x86_64-linux.ai-attribution-scope =
+    pkgs.runCommand "ai-attribution-scope"
+      { nativeBuildInputs = [ pkgs.git ]; }
+      ''
+        export HOME=$TMPDIR CLAUDECODE=1
+        export GIT_CONFIG_SYSTEM=${pkgs.writeText "cobalto-gitconfig" config.flake.nixosConfigurations.cobalto.config.environment.etc.gitconfig.text}
+        printf '[user]\n\tname = Diego\n\temail = d@example.com\n' > $HOME/diego.gitconfig
+        # commit DIR REMOTE GLOBAL: a commit carrying Claude's default trailer.
+        commit() {
+          git init -q "$1" && cd "$1"
+          [ -z "$2" ] || git remote add origin "$2"
+          GIT_CONFIG_GLOBAL=$3 git -c commit.gpgsign=false commit -q --allow-empty -m t \
+            -m 'Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>'
+          git log -1 --format='%an%n%B' > $TMPDIR/out; cd $TMPDIR
+        }
+        want() { grep -q "$1" out || { echo "FAIL $2: no '$1'"; cat out; exit 1; }; }
+        not() { if grep -q "$1" out; then echo "FAIL $2: has '$1'"; cat out; exit 1; fi; }
+
+        commit a https://github.com/diegobarrosaraya/x $HOME/diego.gitconfig
+        want 'Azogue bot <azogue' personal; not Claude personal; want '^Diego$' personal
+        commit b git@github.com:DiegoBarrosA/x.git $HOME/diego.gitconfig
+        want 'Azogue bot <azogue' ssh-remote
+        commit "$HOME/Projects/Personal/c" "" $HOME/diego.gitconfig
+        want 'Azogue bot <azogue' personal-dir
+        commit d https://github.com/acme/x $HOME/diego.gitconfig
+        want Claude work; not Azogue work
+        commit e https://github.com/diegobarrosaraya/x /dev/null
+        want '^Azogue bot$' hermes-personal; not 'Co-Authored-By: Azogue' hermes-personal
+        commit f https://github.com/acme/x /dev/null
+        want '^Hermes$' hermes-work
+        touch "$out"
+      '';
 }

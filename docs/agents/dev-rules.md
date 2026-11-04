@@ -26,7 +26,7 @@ Hermes-launched `claude-<name>` run with `--append-system-prompt-file`.
 ## Version control
 
 - Conventional commits. Commit often, each with a useful message.
-- End every commit message with a `Co-Authored-By:` trailer that names the model you run as.
+- In Diego's personal repos, do not name an AI, model or tool in commits, PR text or comments. A git hook adds the `Co-Authored-By: Azogue bot` trailer.
 
 ## Testing
 
