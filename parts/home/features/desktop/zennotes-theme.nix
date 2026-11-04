@@ -1,10 +1,15 @@
 { ... }:
 {
+  # One ZenNotes theme with rubi's two schemes: colors-light under :root and
+  # colors under [data-theme-mode="dark"]. With theme_mode "auto" the app
+  # follows the system setting, which darkman switches. Fonts come from
+  # config.toml (interface_font, text_font, mono_font), not from the theme.
   flake.modules.homeManager.desktop-zennotes-theme =
-{ config, lib, ... }:
+{ config, lib, pkgs, inputs, ... }:
 let
-  inherit (config.colorscheme) colors;
+  pair = import ../../modules/_colorschemes/colors-pair.nix { inherit inputs lib pkgs; };
 
+  # ZenNotes tokens are space-separated RGB triplets.
   hexToRgb =
     hex:
     let
@@ -15,12 +20,7 @@ let
     in
     "${toString r} ${toString g} ${toString b}";
 
-  c = builtins.mapAttrs (_: hexToRgb) colors;
-
-  themeCss = ''
-    :root {
-      color-scheme: dark;
-
+  vars = colors: shadow: let c = builtins.mapAttrs (_: hexToRgb) colors; in ''
       --z-bg: ${c.base00};
       --z-bg-softer: ${c.base00};
       --z-bg-1: ${c.base01};
@@ -47,20 +47,47 @@ let
       --z-purple: ${c.base0E};
       --z-aqua: ${c.base0C};
 
-      --z-shadow: ${c.base00};
+      --z-shadow: ${c.${shadow}};
+  '';
+
+  themeCss = ''
+    :root {
+      color-scheme: light;
+    ${vars pair.light "base07"}
+    }
+    :root[data-theme-mode="dark"] {
+      color-scheme: dark;
+    ${vars pair.dark "base00"}
     }
   '';
 
   manifest = builtins.toJSON {
-    name = "Base16 (active)";
-    author = "generated from colorscheme.colors";
+    name = "Colors";
+    author = "nix-config";
     version = "1.0.0";
-    description = "Mirrors this host's active base16 colorscheme.";
-    modes = "dark";
+    description = "colors (dark) and colors-light, rubi's terminal and desktop schemes.";
+    modes = "both";
+    preview = {
+      light = "#${pair.light.base0D}";
+      dark = "#${pair.dark.base0D}";
+    };
   };
 in
 {
-  xdg.configFile."zennotes/themes/base16-active/manifest.json".text = manifest;
-  xdg.configFile."zennotes/themes/base16-active/theme.css".text = themeCss;
+  xdg.configFile."zennotes/themes/colors/manifest.json".text = manifest;
+  xdg.configFile."zennotes/themes/colors/theme.css".text = themeCss;
+
+  # config.toml also holds preferences the app writes, so only the three theme
+  # keys are set here, not the whole file. A rebuild resets a theme picked in
+  # the app back to this one.
+  home.activation.zennotesTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    f="${config.xdg.configHome}/zennotes/config.toml"
+    if [ -f "$f" ] && [ ! -L "$f" ]; then
+      run ${pkgs.gnused}/bin/sed -i -E \
+        -e 's/^theme_family = .*/theme_family = "custom"/' \
+        -e 's/^theme_id = .*/theme_id = "custom-colors"/' \
+        -e 's/^theme_mode = .*/theme_mode = "auto"/' "$f"
+    fi
+  '';
 };
 }
