@@ -10,7 +10,6 @@
 {
   imports = [ inputs.impermanence.nixosModules.impermanence ];
 
-  boot.initrd.systemd.enable = true;
   boot.initrd.supportedFilesystems = [ "btrfs" ];
 
   environment.persistence."/nix/persist" = {

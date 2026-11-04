@@ -91,9 +91,10 @@
       flake = true;
     };
 
-    zennotes = {
-      url = "github:ZenNotes/zennotes";
-      inputs.nixpkgs.follows = "nixpkgs";
+    # zennotes-server lives here now. No flake, but its default.nix takes pkgs.
+    znserver = {
+      url = "github:ZenNotes/znserver";
+      flake = false;
     };
 
     ekphos = {

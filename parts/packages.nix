@@ -9,7 +9,7 @@
     import ../pkgs { inherit pkgs lib privatePackages; }
     // {
       coderabbit-cli = inputs.llm-agents.packages.${system}.coderabbit-cli;
-      zennotes-server = inputs.zennotes.packages.${system}.zennotes-server;
+      zennotes-server = import inputs.znserver { inherit pkgs; };
       ekphos = pkgs.callPackage ../pkgs/ekphos { src = inputs.ekphos; };
       teams-calls-fetcher = inputs.teams-calls-fetcher.packages.${system}.default;
     }

@@ -45,9 +45,33 @@
   modifications = final: prev: {
     dummy = prev.hello;
 
-    # litellm in this nixpkgs added VectorStoreSearchError, which aider 0.86.1's
-    # exception-table test rejects; the package itself works.
-    aider-chat = prev.aider-chat.overridePythonAttrs (_: { doCheck = false; });
+    # patchelf 0.19 drops PT_PHDR from the insync launcher, so it segfaults in ld.so, while 0.18
+    # can't patch the bundled libs (no .hash section). Patch everything with 0.19, then redo just
+    # the launcher from its original copy with 0.18. The .deb's Qt *.debug files break patchelf too.
+    # insync-pkg is let-bound inside the package, so reach it through its stdenvNoCC argument.
+    # shortcut: launcher pinned to patchelfUnstable (0.18), drop once nixpkgs patchelf keeps PT_PHDR.
+    insync = prev.insync.override {
+      stdenvNoCC = prev.stdenvNoCC // {
+        mkDerivation = args: prev.stdenvNoCC.mkDerivation (args // {
+          postInstall = (args.postInstall or "") + ''
+            find $out -name '*.debug' -delete
+            cp $out/lib/insync/insync $NIX_BUILD_TOP/insync-orig
+          '';
+          # Appended after autoPatchelfPostFixup, so it runs once autoPatchelf is done.
+          preFixup = (args.preFixup or "") + ''
+            repatchInsyncLauncher() {
+              local bin=$out/lib/insync/insync
+              local interp rpath
+              interp=$(patchelf --print-interpreter $bin)
+              rpath=$(patchelf --print-rpath $bin)
+              cp $NIX_BUILD_TOP/insync-orig $bin
+              ${final.patchelfUnstable}/bin/patchelf --set-interpreter "$interp" --set-rpath "$rpath" $bin
+            }
+            postFixupHooks+=(repatchInsyncLauncher)
+          '';
+        });
+      };
+    };
 
     xdg-desktop-portal-wlr = prev.xdg-desktop-portal-wlr.overrideAttrs (_oldAttrs: {
       version = "0.8.4";

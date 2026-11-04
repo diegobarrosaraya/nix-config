@@ -5,6 +5,8 @@
 {
   programs.nushell = {
     enable = true;
+    # keep pre-26.11 behaviour; silences the stateVersion default-change warning
+    loadSessionVariables = false;
 
     shellAliases = {
 

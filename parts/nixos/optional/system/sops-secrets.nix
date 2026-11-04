@@ -107,12 +107,6 @@ with lib;
       mode = "0400";
     };
 
-    secrets."opencode-server-password" = {
-      owner = "diego";
-      group = "users";
-      mode = "0400";
-    };
-
     secrets."vaultwarden-admin-token" = {
       owner = "root";
       group = "root";
