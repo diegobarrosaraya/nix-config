@@ -52,6 +52,9 @@
       mcpServers =
         config.programs.mcp-config.standardFormat.mcpServers
         // config.programs.claude-code-config.extraMcpServers;
+      
+      # Plugins are per profile too, so repeat the default set here.
+      inherit (config.programs.claude-code-config) enabledPlugins extraKnownMarketplaces;
     };
   };
 
