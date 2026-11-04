@@ -237,6 +237,11 @@ in
 
     backend.mode = "dashboard";
 
+    # rubi's two schemes: dashboard themes "colors" and "colors-light" (picked
+    # in the dashboard's palette menu, so dashboard.theme is not set here or a
+    # deploy would undo the choice), and one CLI skin with a light overlay.
+    hermesHomeFiles = import ./_hermes-themes.nix { inherit inputs lib pkgs; };
+    settings.display.skin = "colors";
 
     # GitHub access goes through an MCP server, so the token never enters the
     # agent's shell. Hermes blocks GH_TOKEN and GITHUB_TOKEN from every shell
