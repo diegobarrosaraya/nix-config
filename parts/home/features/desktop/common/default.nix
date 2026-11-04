@@ -18,6 +18,7 @@ in
     desktop-common-font
     desktop-common-alacritty
     desktop-common-stylix
+    desktop-common-theme-switch
     desktop-common-zen
     desktop-common-playerctl
     desktop-common-mime

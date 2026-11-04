@@ -23,9 +23,13 @@
       custom.git.signingKey = "~/.ssh/keys/git_ed25519.pub";
 
       colorscheme.mode = "dark";
-      colorscheme.type = "material-darker";
+      colorscheme.type = "colors";
       colorscheme.iconFolderColor = "black";
-      colorscheme.specialisations = { };
+      # The base is dark; `theme` and darkman switch to this one and back.
+      colorscheme.specialisations.light = {
+        type = "colors-light";
+        mode = "light";
+      };
 
       imports = with top.config.flake.modules.homeManager; [
         global
