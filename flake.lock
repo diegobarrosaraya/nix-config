@@ -123,11 +123,11 @@
     "confluence-cloud-mcp": {
       "flake": false,
       "locked": {
-        "lastModified": 1793902993,
-        "narHash": "sha256-TaRaui86WdLMw9I2cBBG8miYN3H2y+xDZJowUrSgXzE=",
+        "lastModified": 1793904859,
+        "narHash": "sha256-LXNH+rwBPMLQoyUlOW5CqZYd/3y8gGXXZLHzfNgWGP4=",
         "ref": "refs/heads/main",
-        "rev": "7d8d883721dfbed1d68da0be87d80e0a2c876571",
-        "revCount": 47,
+        "rev": "7c970665ff264e0ce6834e384840787ff42bfa3c",
+        "revCount": 49,
         "type": "git",
         "url": "ssh://git@github.com/diegobarrosaraya/confluence-cloud-mcp.git"
       },
@@ -1055,11 +1055,11 @@
         "trello-cloud-mcp": "trello-cloud-mcp"
       },
       "locked": {
-        "lastModified": 1793903011,
-        "narHash": "sha256-/rnI9UqpdvJ0tC9uBFWVozlac8d5Du7gU4Z7cM33X5U=",
+        "lastModified": 1793904878,
+        "narHash": "sha256-ED1MevdFZsjpqi2Dklh6ckGPtMhaZSkaYSKIXqIclrs=",
         "ref": "refs/heads/master",
-        "rev": "7b1640748ec117ede833325aadf05b2397d8ccab",
-        "revCount": 162,
+        "rev": "1114ee8b1d76d527e475909860074369f565c750",
+        "revCount": 163,
         "type": "git",
         "url": "ssh://git@github.com/diegobarrosaraya/nix-private-config.git"
       },
