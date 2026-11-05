@@ -1,0 +1,16 @@
+# sshd config for jade (nix-on-droid). Shipped as a file, not as inline text in
+# nix-on-droid.nix: the inline version's build failed on the phone.
+# sshd does not expand %h in HostKey or PidFile, so those are absolute here.
+Port 8022
+PasswordAuthentication no
+PermitRootLogin no
+PubkeyAuthentication yes
+UsePAM no
+StrictModes no
+AllowUsers nix-on-droid
+
+HostKey /data/data/com.termux.nix/files/home/.ssh/ssh_host_ed25519_key
+PidFile /data/data/com.termux.nix/files/home/.ssh/sshd.pid
+AuthorizedKeysFile %h/.ssh/authorized_keys
+
+LogLevel VERBOSE

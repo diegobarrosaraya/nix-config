@@ -41,7 +41,7 @@
   home-manager.backupFileExtension = "hm-backup";
 
   home-manager.config =
-    { config, pkgs, lib, ... }:
+    { pkgs, lib, ... }:
     let
       serverScript = pkgs.writeShellScriptBin "phone-llm-server" ''
         set -e
@@ -107,22 +107,7 @@
 
         ".ssh/authorized_keys".text = (lib.concatStringsSep "\n" authorizedKeys) + "\n";
 
-        ".ssh/sshd_config".text = ''
-          Port 8022
-          PasswordAuthentication no
-          PermitRootLogin no
-          PubkeyAuthentication yes
-          UsePAM no
-          StrictModes no
-          AllowUsers nix-on-droid
-
-          # sshd does not expand %h in HostKey or PidFile, so use absolute paths.
-          HostKey ${config.home.homeDirectory}/.ssh/ssh_host_ed25519_key
-          PidFile ${config.home.homeDirectory}/.ssh/sshd.pid
-          AuthorizedKeysFile %h/.ssh/authorized_keys
-
-          LogLevel VERBOSE
-        '';
+        ".ssh/sshd_config".source = ./sshd_config;
       };
 
       programs.ssh = {
