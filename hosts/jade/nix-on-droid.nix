@@ -41,7 +41,7 @@
   home-manager.backupFileExtension = "hm-backup";
 
   home-manager.config =
-    { pkgs, lib, ... }:
+    { config, pkgs, lib, ... }:
     let
       serverScript = pkgs.writeShellScriptBin "phone-llm-server" ''
         set -e
@@ -116,8 +116,9 @@
           StrictModes no
           AllowUsers nix-on-droid
 
-          HostKey %h/.ssh/ssh_host_ed25519_key
-          PidFile %h/.ssh/sshd.pid
+          # sshd does not expand %h in HostKey or PidFile, so use absolute paths.
+          HostKey ${config.home.homeDirectory}/.ssh/ssh_host_ed25519_key
+          PidFile ${config.home.homeDirectory}/.ssh/sshd.pid
           AuthorizedKeysFile %h/.ssh/authorized_keys
 
           LogLevel VERBOSE
