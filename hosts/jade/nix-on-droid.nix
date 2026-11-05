@@ -36,6 +36,9 @@
   };
 
   home-manager.useGlobalPkgs = true;
+  # Existing hand-made files (~/.ssh/config, authorized_keys, sshd_config) are
+  # moved aside instead of blocking the activation.
+  home-manager.backupFileExtension = "hm-backup";
 
   home-manager.config =
     { pkgs, lib, ... }:
