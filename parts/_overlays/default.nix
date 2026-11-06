@@ -1,7 +1,7 @@
 { inputs, ... }:
 {
 
-  additions = final: _prev: import ../../pkgs { pkgs = final; };
+  additions = final: _prev: import ../../pkgs { pkgs = final; privateAssets = inputs.private-assets; };
 
   nixgl = inputs.nixgl.overlay;
 

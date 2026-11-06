@@ -7,6 +7,7 @@
   home.packages = with pkgs; [
 
     nerd-fonts.symbols-only
+    workspace-icons
     source-han-mono
     source-han-sans
 

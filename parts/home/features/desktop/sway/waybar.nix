@@ -499,6 +499,7 @@
             "custom/syncthing"
             "custom/jocalsend-icon"
             "custom/droidcam-icon"
+            "tray"
           ];
         };
 
@@ -595,10 +596,8 @@
                 "custom/scratchpad"
               ];
               modules-center = [
-                "group/worldclocks"
               ];
               modules-right = [
-                "tray"
                 "privacy"
                 "sway/language"
                 "group/services"
@@ -606,6 +605,7 @@
                 "group/audio"
                 "bluetooth"
                 "network"
+                "group/worldclocks"
               ];
             }
             // sharedModules
@@ -615,7 +615,7 @@
         style = ''
 
           * {
-            font-family: "${fonts.sansSerif.name}", "Font Awesome 7 Brands", "Font Awesome 7 Free Solid";
+            font-family: "${fonts.sansSerif.name}", "Workspace Icons", "Font Awesome 7 Brands", "Font Awesome 7 Free Solid";
             font-size: ${toString baseSize}px;
             border: none;
             border-radius: 0;
@@ -633,7 +633,7 @@
           }
 
           window#waybar #workspaces button {
-            font-family: "Font Awesome 7 Brands", "Font Awesome 7 Free Solid";
+            font-family: "Workspace Icons", "Font Awesome 7 Brands", "Font Awesome 7 Free Solid";
             font-weight: normal;
             padding: 0 8px;
             background-image: none;
@@ -649,12 +649,12 @@
 
           window#waybar #workspaces button * {
             text-shadow: none;
-            font-family: "Font Awesome 7 Brands", "Font Awesome 7 Free Solid";
+            font-family: "Workspace Icons", "Font Awesome 7 Brands", "Font Awesome 7 Free Solid";
             font-weight: normal;
           }
 
           window#waybar #workspaces button label {
-            font-family: "Font Awesome 7 Brands", "Font Awesome 7 Free Solid", "${fonts.sansSerif.name}";
+            font-family: "Workspace Icons", "Font Awesome 7 Brands", "Font Awesome 7 Free Solid", "${fonts.sansSerif.name}";
           }
 
           window#waybar #workspaces button.urgent:not(.focused),
@@ -710,8 +710,7 @@
           #network,
           #pulseaudio,
           #bluetooth,
-          #language,
-          #tray {
+          #language {
             padding: 0 12px;
             color: #${colors.base07};
           }
@@ -781,6 +780,11 @@
 
           #tray > .passive {
             -gtk-icon-effect: dim;
+          }
+
+          #tray {
+            padding: 0 12px;
+            background: #${colors.base0D};
           }
 
           #tray > .needs-attention {

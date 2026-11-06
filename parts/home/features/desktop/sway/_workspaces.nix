@@ -6,7 +6,18 @@
 }:
 let
 
-  u = code: builtins.fromJSON ''"\u${code}"'';
+  # Code points above ffff need a JSON surrogate pair (U+100000 is dbc0 dc00).
+  u =
+    code:
+    let
+      n = (builtins.fromTOML "x = 0x${code}").x;
+      v = n - 65536;
+      hex = x: lib.toLower (lib.toHexString x);
+    in
+    if n > 65535 then
+      builtins.fromJSON "\"\\u${hex (55296 + v / 1024)}\\u${hex (56320 + lib.mod v 1024)}\""
+    else
+      builtins.fromJSON "\"\\u${code}\"";
 
   registry = {
     "1" = {
@@ -48,7 +59,7 @@ let
       nameless = true;
     };
     "Web" = {
-      icon = "e007";
+      icon = "f0ac";
       app = "zen-beta";
       key = "f";
       launch = "zen-beta";
@@ -63,12 +74,12 @@ let
       autostart = 5;
     };
     "Agents" = {
-      icon = "e861";
+      icon = "100000"; # sparkles, from pkgs/workspace-icons
       persistent = true;
     };
     "Notes" = {
-      icon = "e879";
-      app = "ZenNotes";
+      icon = "e4e2";
+      app = "zennotes";
       key = "n";
       launch = "zennotes-desktop";
       persistent = true;

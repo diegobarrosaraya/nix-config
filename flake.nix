@@ -92,6 +92,12 @@
       flake = true;
     };
 
+    # Licensed assets (Font Awesome Pro icons), not for the public repo.
+    private-assets = {
+      url = "git+ssh://git@github.com/diegobarrosaraya/private-assets.git";
+      flake = false;
+    };
+
     # zennotes-server lives here now. No flake, but its default.nix takes pkgs.
     znserver = {
       url = "github:ZenNotes/znserver";

@@ -1060,6 +1060,22 @@
         "type": "github"
       }
     },
+    "private-assets": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1793976935,
+        "narHash": "sha256-v8nJh9TjALnvdAXW8vJu2KfjiGgnNg4M1bxOMM0/uBw=",
+        "ref": "refs/heads/master",
+        "rev": "ec51dc621f1fa75f90e8438ed0a27153db410a74",
+        "revCount": 1,
+        "type": "git",
+        "url": "ssh://git@github.com/diegobarrosaraya/private-assets.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/diegobarrosaraya/private-assets.git"
+      }
+    },
     "private-config": {
       "inputs": {
         "confluence-cloud-mcp": "confluence-cloud-mcp",
@@ -1155,6 +1171,7 @@
         "nixvirt": "nixvirt",
         "ponytail": "ponytail",
         "pretty-mermaid-skills": "pretty-mermaid-skills",
+        "private-assets": "private-assets",
         "private-config": "private-config",
         "sops-nix": "sops-nix",
         "stylix": "stylix",
