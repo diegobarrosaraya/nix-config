@@ -6,6 +6,7 @@
   lib,
   pkgs,
   customPkgs,
+  inputs,
   privateConfig ? { },
   ...
 }:
@@ -53,6 +54,22 @@
       browser = "chromium";
       browserPath = "${pkgs.chromium}/bin/chromium";
       userDataDir = "${config.home.homeDirectory}/.config/playwright-chromium-profile";
+    };
+
+    # Second Playwright server for sandbox-only work (doc screenshots, demos).
+    # It keeps the profile in memory, so it holds no logins and cannot clash
+    # with the persistent profile's single-writer lock. Origin allow-lists are
+    # not set: the Playwright MCP docs say they are not a security boundary.
+    extraMcpServers.playwright-sandbox = {
+      command = "${pkgs.playwright-mcp}/bin/playwright-mcp";
+      args = [
+        "--browser" "chromium"
+        "--executable-path" "${pkgs.chromium}/bin/chromium"
+        "--isolated"
+        "--viewport-size" "1920x1080"
+        # Loads window.__ann (boxes, arrows, blur) for the screenshot-annotate skill.
+        "--init-script" "${inputs.ai-tooling}/skills/screenshot-annotate/annotate.js"
+      ];
     };
 
     # Optional MCPs (disabled by default)

@@ -13,7 +13,8 @@
   # Claude Code
   programs.claude-code-config.enable = true;
 
-  home.packages = [ pkgs.pi-coding-agent ];
+  # mermaid-cli (mmdc) renders diagrams to PNG for guides, next to the pretty-mermaid skill.
+  home.packages = [ pkgs.pi-coding-agent pkgs.mermaid-cli ];
   # pi reads user MCP servers from here (standard format); only the notes vault.
   home.file.".pi/agent/mcp.json".text = builtins.toJSON {
     mcpServers = { inherit (config.programs.mcp-config.standardFormat.mcpServers) notes; };
