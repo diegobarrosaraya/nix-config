@@ -1044,6 +1044,22 @@
         "type": "github"
       }
     },
+    "pretty-mermaid-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787416804,
+        "narHash": "sha256-1s35du3Ms+DDwaMVsKiRU4gE0nenC8TWRE7nrXF0PvY=",
+        "owner": "imxv",
+        "repo": "Pretty-mermaid-skills",
+        "rev": "e234ab73c2992f03c36db04fd55ebb90abca9c45",
+        "type": "github"
+      },
+      "original": {
+        "owner": "imxv",
+        "repo": "Pretty-mermaid-skills",
+        "type": "github"
+      }
+    },
     "private-config": {
       "inputs": {
         "confluence-cloud-mcp": "confluence-cloud-mcp",
@@ -1138,6 +1154,7 @@
         "nixpkgs-acp": "nixpkgs-acp",
         "nixvirt": "nixvirt",
         "ponytail": "ponytail",
+        "pretty-mermaid-skills": "pretty-mermaid-skills",
         "private-config": "private-config",
         "sops-nix": "sops-nix",
         "stylix": "stylix",

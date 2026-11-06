@@ -21,6 +21,7 @@
           ${pkgs.zennotes-desktop}/lib/node_modules/zennotes-monorepo/apps/desktop/out/main/cli.js "$@"
       '';
       ekphos = pkgs.callPackage ../pkgs/ekphos { src = inputs.ekphos; };
+      pretty-mermaid-skill = pkgs.callPackage ../pkgs/pretty-mermaid-skill { src = inputs.pretty-mermaid-skills; };
       teams-calls-fetcher = inputs.teams-calls-fetcher.packages.${system}.default;
     }
   );

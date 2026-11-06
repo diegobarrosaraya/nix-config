@@ -57,6 +57,11 @@
     };
 
 
+    pretty-mermaid-skills = {
+      url = "github:imxv/Pretty-mermaid-skills";
+      flake = false;
+    };
+
     impeccable = {
       url = "github:pbakaus/impeccable";
       flake = false;

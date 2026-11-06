@@ -70,6 +70,7 @@
 
     extraSkillSources = [
       "${inputs.impeccable}/.claude/skills"
+      "${customPkgs.pretty-mermaid-skill}"
     ];
   };
 
