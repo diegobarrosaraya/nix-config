@@ -1088,11 +1088,11 @@
         "x-context-mcp": "x-context-mcp"
       },
       "locked": {
-        "lastModified": 1794240204,
-        "narHash": "sha256-FC4UUxEsf2Vn02/3G5qoG4f1xtMN51B/cN7xHtAOob8=",
+        "lastModified": 1794247256,
+        "narHash": "sha256-P22cJdmGQKCq7W9PAaL/i0wKzr025QEN9zQJHJHho8U=",
         "ref": "refs/heads/master",
-        "rev": "69c98dca9430013fde4a562d054fc21e2fde40d1",
-        "revCount": 166,
+        "rev": "896c266323ccba82affc9f4be92521a68442b3a1",
+        "revCount": 167,
         "type": "git",
         "url": "ssh://git@github.com/diegobarrosaraya/nix-private-config.git"
       },
@@ -1556,11 +1556,11 @@
     "x-context-mcp": {
       "flake": false,
       "locked": {
-        "lastModified": 1794240165,
-        "narHash": "sha256-U3nLHdGwwSlRFKrITy4r2eI52/l5tjb8nITXMSoFCeo=",
+        "lastModified": 1794246964,
+        "narHash": "sha256-3hnhc9H+zrveRxmRHELf5Pd2IOjsjawiE5W+hwCyyHs=",
         "ref": "refs/heads/main",
-        "rev": "d1c42a6fbe689047908ca9bc880b254ae2a367df",
-        "revCount": 8,
+        "rev": "0a1008157938905c08a96057258a3647d9d34403",
+        "revCount": 9,
         "type": "git",
         "url": "ssh://git@github.com/diegobarrosaraya/x-context-mcp.git"
       },
