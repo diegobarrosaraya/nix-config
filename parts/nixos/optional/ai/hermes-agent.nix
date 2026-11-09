@@ -200,6 +200,9 @@ in
     {
       config = lib.mkIf laptop {
         services.hermes-agent.settings.auxiliary = laptopSettings.auxiliary;
+        # Extra MCP servers for Hermes chat from the private repo. Not in the briefer profile or the
+        # claude wrappers: x-context needs auth cookies posted by hand, and one copy per machine.
+        services.hermes-agent.mcpServers = inputs.private-config.rubiHermesMcpServers or { };
         services.hermes-agent.documents."AGENTS.md" =
           ''
             # Coding agents on this laptop
