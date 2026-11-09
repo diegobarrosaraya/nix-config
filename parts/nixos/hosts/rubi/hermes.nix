@@ -148,14 +148,19 @@
             group = cfg.group;
             mode = "0750";
           }
+          # The unit changes into this directory before any pre-start step runs (status=200/CHDIR).
+          # tmpfiles and ExecStartPre cannot make it first, so it is its own persisted mount point.
+          {
+            directory = cfg.workingDirectory;
+            user = cfg.user;
+            group = cfg.group;
+            mode = "2770";
+          }
         ];
 
-        # Same job as on cobalto: the persisted state dir hides what activation made.
+        # Wait for the persisted state before the gateway starts.
         systemd.services = {
-          hermes-agent = {
-            unitConfig.RequiresMountsFor = [ cfg.stateDir ];
-            serviceConfig.ExecStartPre = "+${pkgs.coreutils}/bin/install -d -o ${cfg.user} -g ${cfg.group} -m 2770 ${cfg.workingDirectory}";
-          };
+          hermes-agent.unitConfig.RequiresMountsFor = [ cfg.stateDir cfg.workingDirectory ];
         } // brief.services // monitor.services;
 
         # Tools stripped to the notes tools: the brief and the report write notes and do nothing else.
