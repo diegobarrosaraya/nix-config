@@ -28,6 +28,7 @@
     network-cloudflare-warp
     rubi-sops
     rubi-cobalto-shares
+    rubi-hermes
 
     rubi-impermanence
 

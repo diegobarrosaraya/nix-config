@@ -393,4 +393,52 @@ in
         c -m "feat: other" || { echo "FAIL guard: normal commit refused"; exit 1; }
         touch "$out"
       '';
+
+  # Hermes on rubi must never reach a free or pooled model. Config side of the
+  # rule; the runtime side is the smoke test in the design doc.
+  flake.checks.x86_64-linux.hermes-rubi-paid-only =
+    let
+      rubi = config.flake.nixosConfigurations.rubi.config;
+      h = rubi.services.hermes-agent;
+      envText = rubi.sops.templates."hermes.env".content + rubi.sops.templates."hermes-briefer.env".content;
+      hermesPkg = h.package;
+      pinned = t: (h.settings.auxiliary.${t} or { }).provider or null;
+      briefer = h.profiles.briefer.settings;
+    in
+    # Any variable name that is not the Anthropic credential fails.
+    assert
+      lib.all (l: l == "" || lib.hasPrefix "ANTHROPIC_" l) (map (l: lib.head (lib.splitString "=" l)) (lib.splitString "\n" envText))
+      || throw "hermes.env on rubi holds a key other than ANTHROPIC_*";
+    assert h.settings.model.provider == "anthropic" || throw "rubi: main provider is not anthropic";
+    assert h.settings.fallback_providers == [ ] || throw "rubi: fallback_providers is not empty";
+    assert briefer.model.provider == "anthropic" && briefer.fallback_providers == [ ] || throw "rubi: briefer not paid-only";
+    assert h.backend.mode == "none" || throw "rubi: dashboard backend is on";
+    assert
+      !(lib.any (n: lib.hasInfix "nvidia" n || lib.hasInfix "litellm" n || lib.hasInfix "nous" n) (
+        builtins.attrNames (lib.filterAttrs (_: s: s.group == "hermes") rubi.sops.secrets)
+      ))
+      || throw "a secret readable by group hermes on rubi is for NVIDIA, LiteLLM or Nous";
+    pkgs.runCommand "hermes-rubi-paid-only"
+      {
+        pinned = builtins.toJSON (lib.genAttrs (builtins.attrNames h.settings.auxiliary) pinned);
+        passAsFile = [ "pinned" ];
+      }
+      ''
+        # Every auxiliary task the pinned Hermes knows must be pinned to anthropic here.
+        # bin/hermes is a bash wrapper; the python entry point is the path it execs.
+        inner=$(grep '^exec' ${hermesPkg}/bin/hermes | grep -o '/nix/store/[^ "]*' | head -1)
+        py=$(head -1 $inner | sed 's/^#!//')
+        site=$(echo $(dirname $inner)/../lib/python3*/site-packages)
+        $py - <<PY
+        import sys, json
+        sys.path.append("$site")
+        from hermes_cli.config_defaults import DEFAULT_CONFIG as C
+        keys = [k for k, v in C["auxiliary"].items() if isinstance(v, dict)]
+        pinned = json.load(open("$pinnedPath"))
+        bad = [k for k in keys if pinned.get(k) != "anthropic"]
+        if bad:
+            sys.exit("auxiliary tasks not pinned to anthropic: " + ", ".join(bad))
+        PY
+        touch $out
+      '';
 }

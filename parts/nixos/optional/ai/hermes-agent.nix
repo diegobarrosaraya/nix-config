@@ -5,6 +5,8 @@
 
 let
   cfg = config.services.hermes-agent;
+  # rubi: no dashboard, no vault files, one paid account, no work credentials.
+  laptop = config.custom.hermes.laptop;
   hermesThemes = import ./_hermes-themes.nix { inherit inputs lib pkgs; };
   vault = "/srv/media/Obsidian/obsidiana";
   # Hermes may write only here. The rest of the vault is read-only for it.
@@ -21,9 +23,11 @@ let
   # The github server is left out: Hermes has its own read-only GitHub MCP and
   # keeps GH_TOKEN out of every shell on purpose.
   hmDiego = config.home-manager.users.diego;
-  mcpServers = removeAttrs (
-    hmDiego.programs.mcp-config.standardFormat.mcpServers // claudeCfg.extraMcpServers
-  ) [ "github" ];
+  mcpServers =
+    if laptop then { inherit (laptopMcp) notes; }
+    else removeAttrs (
+      hmDiego.programs.mcp-config.standardFormat.mcpServers // claudeCfg.extraMcpServers
+    ) [ "github" ];
   # Plugins come from the store with --plugin-dir (claudeCliArgs), so no
   # enabledPlugins here: nothing is installed or fetched at run time. A headless
   # run cannot answer a permission prompt, so the Bash commands a code task
@@ -65,9 +69,9 @@ let
   # The MCP servers read their credentials from env vars, which diego's shell
   # fills from /run/secrets (cli/mcp.nix). The wrappers do the same here; the
   # secrets are group-readable by hermes (see sops.secrets below).
-  mcpEnv = lib.filterAttrs (
+  mcpEnv = lib.optionalAttrs (!laptop) (lib.filterAttrs (
     n: _: lib.any (p: lib.hasPrefix p n) [ "WORK_" "JIRA_" "CONFLUENCE_" "JSM_" "TRELLO_" "TEMPO_" ]
-  ) (inputs.private-config.workSecretEnv or { });
+  ) (inputs.private-config.workSecretEnv or { }));
   exportMcpEnv = lib.concatStringsSep "\n" (
     lib.mapAttrsToList (
       n: path: ''[ -r ${path} ] && export ${n}="$(${pkgs.coreutils}/bin/tr -d '[:space:]' < ${path})"''
@@ -112,7 +116,7 @@ let
       owners = [ "diegobarrosa" ];
       tokenFile = "/run/secrets/hermes-github-token";
     };
-  } (inputs.private-config.workGit or { });
+  } (lib.optionalAttrs (!laptop) (inputs.private-config.workGit or { }));
   gitEntries = lib.concatMap lib.attrValues (lib.attrValues gitAccess);
   gitHosts = lib.unique (map (a: a.host) gitEntries);
   gitTable = lib.concatStringsSep "\n" (
@@ -159,11 +163,88 @@ let
     "--append-system-prompt-file ${agentRules}"
   ];
   claudeCli = name: claudeBin "claude-${name}" "${pkgs.claude-code}/bin/claude" claudeCliArgs name;
+  # The vault stays on cobalto; rubi reaches it through the ZenNotes server. If the
+  # server is down, jobs fail visibly: there is no fallback to local files.
+  notesServer = "https://notes.minerales.network";
+  laptopMcp.notes = {
+    command = hmDiego.programs.mcp-config.zennotes.cliPath;
+    args = [ "mcp" "--server" notesServer ];
+  };
+  # Every auxiliary task defaults to provider "auto", which can reach another
+  # provider. Pin each one to the paid account. The list is checked against the
+  # Hermes defaults by checks.hermes-rubi-paid-only, so a new key fails the build.
+  auxTasks = [
+    "vision" "compression" "skills_hub" "approval" "review" "mcp" "title_generation"
+    "memory_query_rewrite" "tts_audio_tags" "voice_chat" "triage_specifier"
+    "kanban_decomposer" "profile_describer" "goal_judge" "curator" "monitor"
+    "background_review" "moa_reference" "moa_aggregator"
+  ];
+  laptopSettings = {
+    model = {
+      provider = "anthropic";
+      default = "claude-sonnet-5-5";
+    };
+    # Empty: when the account is limited Hermes stops and says so.
+    fallback_providers = [ ];
+    auxiliary = lib.genAttrs auxTasks (_: {
+      provider = "anthropic";
+      model = "claude-haiku-5-5";
+    });
+  };
+
 in
 {
   imports = [
     inputs.hermes-agent.nixosModules.default
+    # Inline module: a mkIf inside the free-form settings would not be resolved.
     {
+      config = lib.mkIf laptop {
+        services.hermes-agent.settings.auxiliary = laptopSettings.auxiliary;
+        services.hermes-agent.documents."AGENTS.md" =
+          ''
+            # Coding agents on this laptop
+
+            ## Second brain: the notes vault
+
+            - Diego's notes vault is your knowledge base. Use the `notes` MCP (ZenNotes) for it: search
+              it before you ask Diego, and read the project notes before you start work.
+            - Do not read the vault with file tools or the shell. Use the `notes` tools.
+            - Write only under `Hermes/`. Nothing enforces this: the server has no per-folder access, so
+              the rule is yours to keep. Never create, change, move or delete a note outside `Hermes/`.
+              Tell Diego which note you wrote.
+            - If the notes server cannot be reached, say so and stop. Do not look for the vault on disk.
+
+            ## Rules for code work
+
+            - You are the dispatcher. You do not write code. Never edit, create or delete files in a repo yourself.
+            - Never use delegate_task or execute_code to change code. Use a coding agent from the list below.
+            - If a command fails twice with the same error, stop and tell Diego. Do not retry it again.
+            - If your model is rate limited, say so and stop. There is no other model to switch to.
+            - Never push to a default branch. Never merge. The coding agent opens a PR. Diego merges.
+            - Work in worktrees under /var/lib/hermes/workspace. Do not touch the main checkouts.
+              The base is the branch Diego names, else the default branch:
+              `git -C /var/lib/hermes/workspace/<repo> symbolic-ref --short refs/remotes/origin/HEAD`
+            - This host has no git or GitHub credentials. A `git push` fails. Tell Diego, and do not look for tokens.
+
+            ## Tools
+
+            ## Claude Code (one command per account)
+          ''
+          + lib.concatMapStrings (n: "- `claude-${n} -p \"task\"`\n") (lib.attrNames claudeAccounts)
+          + ''
+            - Run it from inside the worktree, with `--output-format json --permission-mode acceptEdits --max-budget-usd 3`.
+              It already has superpowers, ponytail and Diego's dev rules.
+
+            ## Not installed
+            - Codex CLI, OpenCode, Antigravity. Every model on this host is a paid Anthropic model.
+          '';
+      };
+    }
+    {
+      options.custom.hermes.laptop = lib.mkEnableOption ''
+        the laptop variant (rubi): no dashboard, nginx or vault files, notes through the
+        ZenNotes server, one paid Claude account, no work MCP servers or git tokens'';
+
       options.services.hermes-agent.pushProfiles = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ "integrator" "default" "coder" ];
@@ -188,7 +269,7 @@ in
     # turns on the dashboard login gate (basic auth, set in hermes.env) even
     # though the backend binds loopback behind nginx. The dashboard also
     # accepts this hostname as the Host header.
-    environment.HERMES_DASHBOARD_PUBLIC_URL = "https://hermes.minerales.network";
+    environment.HERMES_DASHBOARD_PUBLIC_URL = lib.mkIf (!laptop) "https://hermes.minerales.network";
 
     # Chat runs on the Nous Portal free tier, so the paid OpenCode Go quota is
     # left for coding: Hermes chat emptied the Go weekly window on 2026-10-29.
@@ -196,7 +277,7 @@ in
     # nous), not a declared secret. The model is one of the four :free ids the
     # Portal listed on 2026-10-31, all with tools; this one is the largest.
     # Vault notes reach a free provider: narrowing Hermes's vault access is open.
-    settings.model = {
+    settings.model = if laptop then laptopSettings.model else {
       provider = "nous";
       default = "reflection/beam-1.0-501b-a23b:free";
     };
@@ -212,7 +293,7 @@ in
     # minimax-m3.1-flash returned 200 (2026-10-28), so re-test before changing
     # ids. OpenCode Zen is left out: its free tier makes Hermes wait 600 s per
     # retry once capped.
-    settings.fallback_providers = [
+    settings.fallback_providers = if laptop then laptopSettings.fallback_providers else [
       {
         provider = "nvidia";
         model = "nvidia/nemotron-3-ultra-550b-a55b";
@@ -235,7 +316,7 @@ in
       max_in_progress_per_profile = 1;
     };
 
-    backend.mode = "dashboard";
+    backend.mode = if laptop then "none" else "dashboard";
 
     # rubi's two schemes as defaults: the dashboard theme and the CLI skin
     # each carry dark and light and follow the system or terminal setting.
@@ -262,12 +343,12 @@ in
     # diego), so the ACLs from hermes-vault-access still limit writes to Hermes/.
     mcpServers.notes = {
       command = hmDiego.programs.mcp-config.zennotes.cliPath;
-      args = [ "mcp" ];
+      args = if laptop then laptopMcp.notes.args else [ "mcp" ];
     };
     # Its bundled obsidian skill reads the vault with file tools instead.
     settings.skills.disabled = [ "obsidian" ];
 
-    mcpServers.github = {
+    mcpServers.github = lib.mkIf (!laptop) {
       command = "${pkgs.github-mcp-server}/bin/github-mcp-server";
       args = [ "stdio" "--read-only" "--toolsets" "repos,issues,pull_requests" ];
       env.GITHUB_PERSONAL_ACCESS_TOKEN = "\${GH_TOKEN}";
@@ -296,7 +377,7 @@ in
   ++ lib.mapAttrsToList claudeCli claudeAccounts
   # Hermes skills look for `claude` and `opencode` on PATH. Bare opencode exports
   # OPENCODE_API_KEY from the shared opencode-api-key secret; bare claude is personal.
-  ++ [
+  ++ lib.optionals (!laptop) [
     (pkgs.writeShellScriptBin "opencode" ''
       key="$(${pkgs.coreutils}/bin/tr -d '[:space:]' < /run/secrets/opencode-api-key 2>/dev/null || true)"
       if [ -z "$key" ]; then
@@ -311,7 +392,7 @@ in
     '')
   ]
   ++ lib.optional (claudeAccounts ? personal) (claudeBin "claude" "${pkgs.claude-code}/bin/claude" claudeCliArgs "personal" claudeAccounts.personal)
-  ++ [
+  ++ lib.optionals (!laptop) [
     # Antigravity CLI for Hermes. The Google login is manual, done once as the
     # hermes user (sudo -u hermes hermes-agy), and lives in agyHome, which sits
     # under the persisted /var/lib/hermes. Hermes runs it as a shell command:
@@ -329,7 +410,7 @@ in
   # Fonts for the dashboard themes, same-origin because its CSP allows only
   # 'self' and Google Fonts. Public font files, so no access rules here; the
   # vhost itself is in minerales-network.nix.
-  services.nginx.virtualHosts."hermes.minerales.network".locations."${hermesThemes.fontPath}/" = {
+  services.nginx.virtualHosts."hermes.minerales.network".locations."${hermesThemes.fontPath}/" = lib.mkIf (!laptop) {
     alias = "${hermesThemes.fonts}/";
     extraConfig = ''
       expires 30d;
@@ -338,7 +419,7 @@ in
   };
 
   services.hermes-agent.workingDirectory = "/var/lib/hermes/workspace";
-  services.hermes-agent.documents."AGENTS.md" =
+  services.hermes-agent.documents."AGENTS.md" = lib.mkIf (!laptop) (
     ''
       # Coding agents on this host
 
@@ -462,7 +543,8 @@ in
 
       ## Not installed
       - Codex CLI.
-    '';
+    ''
+  );
 
   security.sudo.extraRules = [
     {
@@ -477,14 +559,17 @@ in
           command = "/run/current-system/sw/bin/hermes-agy";
           options = [ "NOPASSWD" ];
         }
-      ];
+      ] ++ lib.optional laptop {
+        command = "/run/current-system/sw/bin/hermes-kanban";
+        options = [ "NOPASSWD" ];
+      };
     }
   ];
 
   # The MCP secrets are owned by diego (group users, 0400). Hermes's wrappers
   # read them, so give group hermes read access. Names come from the same
   # secretEnv map as diego's shell, so the two stay in step.
-  sops.secrets = {
+  sops.secrets = lib.optionalAttrs (!laptop) {
     # Personal git token, also read by the credential helper and gh wrapper.
     hermes-github-token = {
       group = "hermes";
@@ -534,19 +619,25 @@ in
   # activation made, and the backend started before tmpfiles recreated it
   # (status=200/CHDIR), which failed the switch. Wait for the mount and create
   # the directory as root before the unit changes into it.
-  systemd.services.hermes-backend = {
+  systemd.services.hermes-backend = lib.mkIf (!laptop) {
     unitConfig.RequiresMountsFor = [ cfg.stateDir ];
     serviceConfig.ExecStartPre = "+${pkgs.coreutils}/bin/install -d -o ${cfg.user} -g ${cfg.group} -m 2770 ${cfg.workingDirectory}";
+    # ProtectSystem=strict makes /srv read-only; open the scratch folder only.
+    serviceConfig.ReadWritePaths = [ scratch ];
+    requires = [ "hermes-vault-access.service" ];
+    after = [ "hermes-vault-access.service" "sops-install-secrets.service" ];
+    wants = [ "sops-install-secrets.service" ];
+    serviceConfig.EnvironmentFile = [ config.sops.templates."hermes.env".path ];
   };
 
   # ProtectSystem=strict makes /srv read-only for the units. Open the
   # scratch folder only, for the gateway and for the dashboard's chat TUI.
-  systemd.services.hermes-agent.serviceConfig.ReadWritePaths = [ scratch ];
+  systemd.services.hermes-agent.serviceConfig.ReadWritePaths = lib.mkIf (!laptop) [ scratch ];
 
   # The gateway drains running agents for up to 1885 s on a restart. The
   # default stop timeout is 90 s, which cut running tasks off on every deploy.
   # A deploy now waits for a running task to finish, up to this long.
-  systemd.services.hermes-agent.serviceConfig.TimeoutStopSec = 1900;
+  systemd.services.hermes-agent.serviceConfig.TimeoutStopSec = lib.mkIf (!laptop) 1900;
 
   # Deploy race (seen 2026-10-29): while hermes-agent was stopped, the dashboard
   # found no gateway and started its own `gateway run --idle-exit`. That stray
@@ -558,7 +649,6 @@ in
   # so it refuses to start a gateway itself and reports the gateway as
   # unavailable until the unit is back, which is what we want.
   systemd.services.hermes-agent.aliases = [ "hermes-gateway.service" ];
-  systemd.services.hermes-backend.serviceConfig.ReadWritePaths = [ scratch ];
 
   # POSIX ACLs, because the vault belongs to diego (Syncthing) and the parents
   # to media. hermes gets traverse on the parents, read on the vault, and
@@ -569,7 +659,7 @@ in
   # This is a oneshot the units depend on, not a tmpfiles rule: a unit with
   # ReadWritePaths fails with 226/NAMESPACE when the path is missing, and
   # tmpfiles does not run again when the unit restarts, so it looped forever.
-  systemd.services.hermes-vault-access = {
+  systemd.services.hermes-vault-access = lib.mkIf (!laptop) {
     description = "Create the Hermes scratch folder and set its ACLs in the vault";
     unitConfig.RequiresMountsFor = [ vault ];
     path = [ pkgs.acl pkgs.coreutils pkgs.findutils ];
@@ -595,14 +685,8 @@ in
   # unit start instead, and restartUnits on the template restarts the units
   # after each render. The .env copy stays as a harmless duplicate.
   systemd.services.hermes-agent = {
-    requires = [ "hermes-vault-access.service" ];
-    after = [ "hermes-vault-access.service" "sops-install-secrets.service" ];
-    wants = [ "sops-install-secrets.service" ];
-    serviceConfig.EnvironmentFile = [ config.sops.templates."hermes.env".path ];
-  };
-  systemd.services.hermes-backend = {
-    requires = [ "hermes-vault-access.service" ];
-    after = [ "hermes-vault-access.service" "sops-install-secrets.service" ];
+    requires = lib.optional (!laptop) "hermes-vault-access.service";
+    after = lib.optional (!laptop) "hermes-vault-access.service" ++ [ "sops-install-secrets.service" ];
     wants = [ "sops-install-secrets.service" ];
     serviceConfig.EnvironmentFile = [ config.sops.templates."hermes.env".path ];
   };

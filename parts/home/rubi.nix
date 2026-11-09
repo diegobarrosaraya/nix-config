@@ -73,6 +73,22 @@
       };
 
       programs.nushell.shellAliases.hermes-cobalto = "ssh -t cobalto sudo -u hermes /run/current-system/sw/bin/hermes-tui";
+      # Hermes on this machine (ai-hermes-agent, laptop variant).
+      programs.nushell.shellAliases.hermes = "sudo -u hermes /run/current-system/sw/bin/hermes-tui";
+      programs.nushell.shellAliases.hermes-kanban = "sudo -u hermes /run/current-system/sw/bin/hermes-kanban";
+
+      # Work account for coding jobs (claude-<name> launcher, token from sops). Only the
+      # accounts rubi may use, from the private repo. Hermes wrappers: ai/hermes-agent.nix.
+      programs.claude-code-config = {
+        acpPackage =
+          (import inputs.nixpkgs-acp {
+            system = pkgs.stdenv.hostPlatform.system;
+            config.allowUnfree = true;
+          }).claude-agent-acp;
+        profiles = lib.mapAttrs (_: p: lib.recursiveUpdate p {
+          mcpServers = { inherit (config.programs.mcp-config.standardFormat.mcpServers) notes; };
+        }) (privateConfig.rubiClaudeProfiles or { });
+      };
 
       # ZenNotes replaced Obsidian. Home-manager's Obsidian module linked four
       # files into ~/Notes/.obsidian. Dropping the module would delete them, and
