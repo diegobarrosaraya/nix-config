@@ -6,7 +6,7 @@
       pkgs = config.flake.legacyPackages.${system};
       privatePackages = inputs.private-config.packages.${system} or { };
     in
-    import ../pkgs { inherit pkgs lib privatePackages; privateAssets = inputs.private-assets; }
+    import ../pkgs { inherit pkgs lib privatePackages; }
     // {
       coderabbit-cli = inputs.llm-agents.packages.${system}.coderabbit-cli;
       zennotes-server = import inputs.znserver { inherit pkgs; };

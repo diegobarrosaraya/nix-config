@@ -13,8 +13,7 @@
       isGnome = desktop == "gnome";
     in
     {
-
-      home.packages = [ pkgs.font-awesome ];
+      home.packages = [ pkgs.material-symbols-filled ];
       stylix = {
         enable = true;
 

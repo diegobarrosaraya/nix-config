@@ -13,32 +13,46 @@
       # Outputs matched by "make model serial": connector names (DP-8, DP-9, ...)
       # change between docks. Waybar has no partial match.
       laptop = "Lenovo Group Limited 0x403C";
-      samsung = "Samsung Electric Company LS27A600U HCJW500005";
 
       inherit (config.colorscheme) colors;
       inherit (config.stylix) fonts;
 
-      baseSize = fonts.sizes.desktop;
+      common = {
+        layer = "top";
+        position = "top";
+        height = 32;
+        spacing = 4;
+        modules-left = [
+          "sway/workspaces"
+          "sway/mode"
+          "custom/scratchpad"
+        ];
+        modules-center = [ "sway/window" ];
+      };
+
+      baseSize = fonts.sizes.desktop + 4;
       trayIconSize = baseSize;
 
       u = code: builtins.fromJSON ''"\u${code}"'';
 
       workspaces = import ./_workspaces.nix {
-        inherit lib;
+        inherit lib colors;
         labelFont = fonts.sansSerif.name;
       };
 
-      iconCb = u "f3ed";
-      iconLock = u "f023";
-      iconServer = u "f233";
-      iconSync = u "f021";
-      iconCloud = u "f0c2";
-      iconShare = u "f1e0";
-      iconCamera = u "f030";
+      pipe = "<span foreground='#${colors.base03}'>|</span>";
+      iconRam = builtins.fromJSON ''"\udb80\udf5b"'';
+      iconCb = u "e8e8";
+      iconLock = u "e897";
+      iconServer = u "e875";
+      iconSync = u "e627";
+      iconCloud = u "e2bd";
+      iconShare = u "e80d";
+      iconCamera = u "e412";
       # State glyphs shared by the cb/tailscale/cobalto/syncthing modules so a
       # down/warning state is readable by shape, not just by waybar's color class.
-      iconStateError = u "f057";
-      iconStateWarning = u "f071";
+      iconStateError = u "e5c9";
+      iconStateWarning = u "e002";
 
       waybar-cb = pkgs.writeShellScriptBin "waybar-cb" ''
         if systemctl is-active --quiet cbagentd; then
@@ -104,9 +118,23 @@
         fi
       '';
 
+      waybar-mic = pkgs.writeShellScriptBin "waybar-mic" ''
+        pactl=${lib.getExe' pkgs.pulseaudio "pactl"}
+        # Streams that read an output monitor (cava, desktop-sound recorders) are not the mic.
+        monitors=$($pactl list short sources 2>/dev/null | awk '$2 ~ /\.monitor$/ {print $1}')
+        count=$($pactl list short source-outputs 2>/dev/null \
+          | awk -v m="$monitors" 'BEGIN { n = split(m, a, "\n"); for (i = 1; i <= n; i++) mon[a[i]] = 1 } !($2 in mon)' \
+          | wc -l)
+        if [ "$count" -gt 0 ]; then
+          ${lib.getExe pkgs.jq} -cn --arg t "${pipe} [ ${u "f130"}  mic ]" '{text: $t, class: "critical", tooltip: "Microphone in use"}'
+        else
+          printf '{"text":""}\n'
+        fi
+      '';
+
       waybar-jack = pkgs.writeShellScriptBin "waybar-jack" ''
         if systemctl --user is-active --quiet pipewire; then
-          printf '{"text":"%s","class":"ok","tooltip":"JACK (pipewire-jack) running"}\n' "${u "f8d9"}"
+          printf '{"text":"%s","class":"ok","tooltip":"JACK (pipewire-jack) running"}\n' "${u "efe6"}"
         else
           printf '{"text":"%s","class":"error","tooltip":"JACK (pipewire) not running"}\n' "${iconStateError}"
         fi
@@ -230,9 +258,9 @@
         COUNT=$(${lib.getExe pkgs.jq} '[.. | objects | select(.type == "con" and .scratchpad_state? and .scratchpad_state != "none")] | length' < <(swaymsg -t get_tree))
 
         if [ "$COUNT" -gt 0 ]; then
-          printf '{"text":"%s %s","class":"has-items","tooltip":"%s window(s) in scratchpad"}\n' "${u "f2d2"}" "$COUNT" "$COUNT"
+          printf '{"text":"%s %s","class":"has-items","tooltip":"%s window(s) in scratchpad"}\n' "${u "e53b"}" "$COUNT" "$COUNT"
         else
-          printf '{"text":"%s","class":"empty","tooltip":"Scratchpad empty"}\n' "${u "f2d2"}"
+          printf '{"text":"%s","class":"empty","tooltip":"Scratchpad empty"}\n' "${u "e53b"}"
         fi
       '';
 
@@ -243,9 +271,9 @@
       };
 
       networkModule = {
-        format-wifi = "${u "f1eb"}";
-        format-ethernet = "${u "f796"}";
-        format-disconnected = "${u "f071"} Disconnected";
+        format-wifi = "${pipe} ${u "f1eb"}  {essid}";
+        format-ethernet = "${pipe} ${u "f1eb"}  {ifname}";
+        format-disconnected = "${pipe} [ ${u "f127"}  down ]";
         tooltip-format-wifi = "{essid} ({signalStrength}%)";
         tooltip-format-ethernet = "{ifname}";
         on-click = "alacritty -e wifitui";
@@ -273,8 +301,13 @@
 
         "custom/location-clock" = locationClockModule;
 
+        "sway/window" = {
+          format = "{title}";
+          max-length = 70;
+        };
+
         clock = {
-          format = "{:%a %b %d  %H:%M}";
+          format = "${u "f017"}  {:%a %d %b  %H:%M}";
           tooltip-format = "<tt><small>{calendar}</small></tt>";
         };
 
@@ -359,6 +392,26 @@
           return-type = "json";
         };
 
+        "custom/sep" = {
+          exec = "echo x";
+          interval = "once";
+          format = pipe;
+          tooltip = false;
+        };
+
+        "custom/sep#clocks" = {
+          exec = "echo x";
+          interval = "once";
+          format = pipe;
+          tooltip = false;
+        };
+
+        "custom/mic" = {
+          exec = "${lib.getExe waybar-mic}";
+          interval = 2;
+          return-type = "json";
+        };
+
         "custom/jack" = {
           exec = "${lib.getExe waybar-jack}";
           interval = 30;
@@ -387,21 +440,16 @@
         };
 
         mpris = {
-          format = "{player_icon} {dynamic}";
-          format-paused = "{status_icon} {dynamic}";
-          player-icons = {
-            default = "${u "f001"}";
-          };
-          status-icons = {
-            paused = "${u "f04c"}";
-          };
+          format = "${pipe} ${u "f001"}  {dynamic}";
+          format-paused = "${pipe} ${u "f001"}  {dynamic}";
+          dynamic-len = 28;
         };
 
         idle_inhibitor = {
           format = "{icon}";
           format-icons = {
-            activated = "${u "f06e"}";
-            deactivated = "${u "f070"}";
+            activated = "${u "e8f4"}";
+            deactivated = "${u "e8f5"}";
           };
         };
 
@@ -409,29 +457,35 @@
           format = "{icon}";
           tooltip-format = "Power profile: {profile}";
           format-icons = {
-            default = "${u "f011"}";
-            performance = "${u "f0e7"}";
-            balanced = "${u "f24e"}";
-            power-saver = "${u "f2ca"}";
+            default = "${u "e8ac"}";
+            performance = "${u "ea0b"}";
+            balanced = "${u "eaf6"}";
+            power-saver = "${u "ea35"}";
           };
         };
 
         temperature = {
           critical-threshold = 80;
-          format = "${u "f2c9"} {temperatureC}°C";
+          format = "${u "f076"} {temperatureC}°C";
           tooltip = true;
         };
 
         disk = {
-          path = "/";
-          format = "${u "f0a0"} {percentage_used}%";
+          path = "/nix";
+          states = {
+            warning = 85;
+            critical = 95;
+          };
+          format = "";
+          format-warning = "${pipe} [ ${u "f0a0"}  {path} {percentage_used}% ]";
+          format-critical = "${pipe} [ ${u "f0a0"}  {path} {percentage_used}% ]";
           tooltip-format = "{used} used / {total} ({percentage_used}%)";
           interval = 30;
         };
 
         privacy = {
           icon-spacing = 4;
-          icon-size = 14;
+          icon-size = 18;
           transition-duration = 250;
         };
 
@@ -471,15 +525,15 @@
         };
 
         pulseaudio = {
-          format = "${u "f028"}";
-          format-muted = "${u "f6a9"}";
-          format-bluetooth = "${u "f294"}";
+          format = "${pipe} ${u "f028"}  {volume}%";
+          format-muted = "${pipe} [ ${u "f026"}  muted ]";
+          format-bluetooth = "${pipe} ${u "f025"}  {volume}%";
           on-click = "alacritty -e wiremix";
         };
 
         wireplumber = {
-          format = "${u "f028"}";
-          format-muted = "${u "f6a9"}";
+          format = "${u "e050"}";
+          format-muted = "${u "e04f"}";
         };
 
         "group/services" = {
@@ -504,16 +558,28 @@
         };
 
         cpu = {
-          format = "${u "f2db"} {usage}%";
-          format-alt = "${u "f2db"} {avg_frequency} GHz";
+          states = {
+            warning = 70;
+            critical = 95;
+          };
+          format = "${pipe} ${u "f2db"}  {usage}%";
+          format-warning = "${pipe} [ ${u "f2db"}  {usage}% ]";
+          format-critical = "${pipe} [ ${u "f2db"}  {usage}% ]";
+          format-alt = "${pipe} ${u "f2db"}  {avg_frequency} GHz";
           tooltip = true;
           interval = 5;
           on-click = "alacritty -e ${pkgs.bottom}/bin/btm";
         };
 
         memory = {
-          format = "${u "f538"} {}%";
-          format-alt = "${u "f538"} {used:0.1f}GiB/{total:0.1f}GiB";
+          states = {
+            warning = 75;
+            critical = 90;
+          };
+          format = "${pipe} ${iconRam}  {used:0.1f}G";
+          format-warning = "${pipe} [ ${iconRam}  {used:0.1f}G ]";
+          format-critical = "${pipe} [ ${iconRam}  {used:0.1f}G ]";
+          format-alt = "${pipe} ${iconRam}  {used:0.1f}GiB/{total:0.1f}GiB";
           tooltip-format = "{used:0.1f}G / {total:0.1f}G";
           interval = 5;
           on-click = "alacritty -e ${pkgs.bottom}/bin/btm";
@@ -521,7 +587,7 @@
 
         backlight = {
           format = "{icon} {percent}%";
-          format-icons = [ "${u "f185"}" ];
+          format-icons = [ "${u "e430"}" ];
         };
 
         battery = {
@@ -529,9 +595,11 @@
             warning = 30;
             critical = 15;
           };
-          format = "{icon}";
-          format-charging = "${u "e55b"}";
-          format-plugged = "${u "f1e6"}";
+          format = "${pipe} {icon}  {capacity}%";
+          format-warning = "${pipe} [ {icon}  {capacity}% ]";
+          format-critical = "${pipe} [ {icon}  {capacity}% ]";
+          format-charging = "${pipe} ${u "f0e7"}  {capacity}%";
+          format-plugged = "${pipe} ${u "f1e6"}  {capacity}%";
           format-icons = [
             "${u "f244"}"
             "${u "f243"}"
@@ -552,12 +620,12 @@
         network = networkModule;
 
         bluetooth = {
-          format = "${u "f294"}";
-          format-on = "${u "f294"}";
+          format = "${pipe} ${u "e1a7"}";
+          format-on = "${pipe} ${u "e1a7"}";
           format-off = "";
           format-disabled = "";
-          format-connected = "${u "f294"}";
-          format-connected-battery = "${u "f294"} {device_battery_percentage}%";
+          format-connected = "${pipe} ${u "e1a7"}";
+          format-connected-battery = "${pipe} ${u "e1a7"} {device_battery_percentage}%";
           format-no-controller = "";
           tooltip-format = "{controller_alias}\t{controller_address}\n\n{status}";
           tooltip-format-connected = "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}";
@@ -580,31 +648,43 @@
         };
 
         settings = [
+          # External screens (anything but the laptop panel): the full bar.
           (
-            {
-              layer = "top";
-              position = "top";
-              height = 36;
-              spacing = 4;
-              output = [
-                laptop
-                samsung
-              ];
-              modules-left = [
-                "sway/workspaces"
-                "sway/mode"
-                "custom/scratchpad"
-              ];
-              modules-center = [
-              ];
+            common
+            // {
+              output = "!${laptop}";
               modules-right = [
-                "privacy"
-                "sway/language"
+                "custom/mic"
+                "mpris"
+                "custom/sep"
                 "group/services"
-                "group/hardware"
-                "group/audio"
-                "bluetooth"
+                "disk"
+                "cpu"
+                "memory"
                 "network"
+                "bluetooth"
+                "pulseaudio"
+                "battery"
+                "custom/sep#clocks"
+                "group/worldclocks"
+              ];
+            }
+            // sharedModules
+          )
+          # Laptop panel: no music and no services drawer.
+          (
+            common
+            // {
+              output = laptop;
+              modules-right = [
+                "custom/mic"
+                "disk"
+                "cpu"
+                "memory"
+                "network"
+                "pulseaudio"
+                "battery"
+                "custom/sep#clocks"
                 "group/worldclocks"
               ];
             }
@@ -615,7 +695,7 @@
         style = ''
 
           * {
-            font-family: "${fonts.sansSerif.name}", "Workspace Icons", "Font Awesome 7 Brands", "Font Awesome 7 Free Solid";
+            font-family: "${fonts.monospace.name}", "Material Symbols Filled";
             font-size: ${toString baseSize}px;
             border: none;
             border-radius: 0;
@@ -632,64 +712,39 @@
             opacity: 1;
           }
 
+          /* Bracket style: "[name]" text in the mono font. Focused is bold accent, the rest dim. */
           window#waybar #workspaces button {
-            font-family: "Workspace Icons", "Font Awesome 7 Brands", "Font Awesome 7 Free Solid";
+            font-family: "${fonts.monospace.name}";
             font-weight: normal;
-            padding: 0 8px;
+            padding: 0 2px;
             background-image: none;
+            background-color: transparent;
             border: none;
             border-radius: 0;
             box-shadow: none;
             outline: none;
             text-shadow: none;
             border-image: none;
-            color: #${colors.base07};
+            color: #${colors.base00};
             -gtk-icon-effect: none;
           }
 
           window#waybar #workspaces button * {
             text-shadow: none;
-            font-family: "Workspace Icons", "Font Awesome 7 Brands", "Font Awesome 7 Free Solid";
-            font-weight: normal;
-          }
-
-          window#waybar #workspaces button label {
-            font-family: "Workspace Icons", "Font Awesome 7 Brands", "Font Awesome 7 Free Solid", "${fonts.sansSerif.name}";
-          }
-
-          window#waybar #workspaces button.urgent:not(.focused),
-          window#waybar #workspaces button.active.urgent:not(.focused) {
-            background-color: #${colors.base08};
-            color: #${colors.base00};
-            box-shadow: none;
-          }
-
-          window#waybar #workspaces button.urgent:not(.focused) *,
-          window#waybar #workspaces button.active.urgent:not(.focused) * {
-            color: #${colors.base00};
+            font-family: "${fonts.monospace.name}";
+            font-weight: inherit;
           }
 
           window#waybar #workspaces button:hover {
-            background-color: #${colors.base01};
+            background-color: transparent;
             background-image: none;
-            color: #${colors.base07};
             box-shadow: none;
           }
 
           window#waybar #workspaces button.focused,
-          window#waybar #workspaces button.focused *,
-          window#waybar #workspaces button.focused label,
-          window#waybar #workspaces button.active,
-          window#waybar #workspaces button.active * {
-            color: #${colors.base0D};
-            font-weight: 400;
-          }
-
-          window#waybar #workspaces button.focused,
-          window#waybar #workspaces button.active {
-            background-image: none;
-            box-shadow: none;
-            border-radius: 0px;
+          window#waybar #workspaces button.focused * {
+            color: #${colors.base0C};
+            font-weight: bold;
           }
 
           #mode {
@@ -726,21 +781,24 @@
             color: #${colors.base07};
           }
 
-          #battery.warning:not(.charging) {
+          #battery.warning:not(.charging),
+          #cpu.warning,
+          #memory.warning,
+          #disk.warning {
             color: #${colors.base09};
           }
 
-          #battery.critical:not(.charging) {
-            background-color: #${colors.base0F};
-            color: #${colors.base00};
-            animation: blink 0.5s linear infinite alternate;
+          #battery.critical:not(.charging),
+          #cpu.critical,
+          #memory.critical,
+          #disk.critical,
+          #network.disconnected,
+          #pulseaudio.muted {
+            color: #${colors.base08};
           }
 
-          @keyframes blink {
-            to {
-              background-color: #${colors.base00};
-              color: #${colors.base0F};
-            }
+          #battery.charging {
+            color: #${colors.base0B};
           }
 
           #cpu {
@@ -749,18 +807,6 @@
 
           #memory {
             color: #${colors.base07};
-          }
-
-          #backlight {
-            color: #${colors.base0A};
-          }
-
-          #network.disconnected {
-            color: #${colors.base0F};
-          }
-
-          #pulseaudio.muted {
-            color: #${colors.base03};
           }
 
           #bluetooth.connected {
@@ -815,6 +861,20 @@
             color: #${colors.base07};
           }
 
+          #custom-cb,
+          #custom-tailscale,
+          #custom-warp,
+          #custom-cobalto,
+          #custom-jack,
+          #custom-syncthing,
+          #custom-jocalsend-icon,
+          #custom-droidcam-icon,
+          #custom-scratchpad,
+          #idle_inhibitor,
+          #power-profiles-daemon {
+            font-family: "Material Symbols Filled";
+          }
+
           #custom-scratchpad.empty {
             color: #${colors.base03};
           }
@@ -860,6 +920,8 @@
           #mpris,
           #idle_inhibitor,
           #power-profiles-daemon,
+          #custom-mic,
+          #custom-sep,
           #temperature,
           #disk,
           #privacy {
@@ -891,6 +953,10 @@
             color: #${colors.base08};
           }
 
+          #custom-mic.critical {
+            color: #${colors.base08};
+          }
+
           .privacy-item {
             color: #${colors.base08};
           }
@@ -915,6 +981,7 @@
         waybar-warp
         waybar-cobalto
         waybar-jack
+        waybar-mic
         waybar-syncthing
         waybar-jocalsend-icon
         waybar-jocalsend

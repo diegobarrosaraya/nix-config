@@ -2,6 +2,7 @@
   lib,
 
   labelFont ? "sans-serif",
+  colors,
   ...
 }:
 let
@@ -21,22 +22,22 @@ let
 
   registry = {
     "1" = {
-      icon = "f111";
+      icon = "ef4a";
       nameless = true;
       # persistent = true;
     };
     "2" = {
-      icon = "f0c8";
+      icon = "eb36";
       nameless = true;
       # persistent = true;
     };
     "3" = {
-      icon = "f219";
+      icon = "ead5";
       nameless = true;
       # persistent = true;
     };
     "4" = {
-      icon = "f005";
+      icon = "e838";
       nameless = true;
       # persistent = true;
     };
@@ -59,7 +60,7 @@ let
       nameless = true;
     };
     "Web" = {
-      icon = "f0ac";
+      icon = "e87a";
       app = "zen-beta";
       key = "f";
       launch = "zen-beta";
@@ -67,18 +68,18 @@ let
       autostart = 2;
     };
     "Files" = {
-      icon = "f802";
+      icon = "ea85";
       launcher = "superfile-launcher";
       key = "e";
       persistent = true;
       autostart = 5;
     };
     "Agents" = {
-      icon = "100000"; # sparkles, from pkgs/workspace-icons
+      icon = "e65f"; # Material auto_awesome
       persistent = true;
     };
     "Notes" = {
-      icon = "e4e2";
+      icon = "e9f4";
       app = "zennotes";
       key = "n";
       launch = "zennotes-desktop";
@@ -89,29 +90,21 @@ in
 {
   inherit registry;
 
-  waybarWorkspaces =
-    let
-      absorb = "<span font_size='0.1pt'> ";
-
-      label = "<span font_family='${labelFont}'>";
-      iconWorkspaces = lib.filterAttrs (_: v: !(v.nameless or false) && v ? icon) registry;
-    in
-    {
-      disable-scroll = false;
-      all-outputs = true;
-      strip-workspace-numbers = true;
-      format = "{icon}{name}</span>";
-      format-icons =
-
-        (lib.mapAttrs (_: v: "${u v.icon}${absorb}") iconWorkspaces) // {
-
-          "default" = "${u "f22d"}${label}";
-          "focused" = "${u "f192"}${label}";
-
-          "high-priority-named" = lib.attrNames iconWorkspaces;
-        };
-      persistent-workspaces = lib.mapAttrs' (
-        n: v: lib.nameValuePair (if v.nameless or false then "${n}:" else n) [ ]
-      ) (lib.filterAttrs (_: v: v.persistent or false) registry);
+  # Bracket style (see the mockup): the focused workspace is "[ name ]" in the accent, the
+  # rest are dim " name". The trailing bracket sits outside the span, so the CSS button
+  # colour decides it: accent when focused, the bar background (invisible) otherwise.
+  waybarWorkspaces = {
+    disable-scroll = false;
+    all-outputs = true;
+    strip-workspace-numbers = true;
+    format = "{icon}{name}</span>]";
+    format-icons = {
+      default = "<span foreground='#${colors.base04}'> ";
+      focused = "<span foreground='#${colors.base0C}' weight='bold'>[";
+      urgent = "<span foreground='#${colors.base08}'> ";
     };
+    persistent-workspaces = lib.mapAttrs' (
+      n: v: lib.nameValuePair (if v.nameless or false then "${n}:" else n) [ ]
+    ) (lib.filterAttrs (_: v: v.persistent or false) registry);
+  };
 }

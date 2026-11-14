@@ -1,4 +1,4 @@
-{ pkgs, lib ? null, colors ? null, privatePackages ? {}, privateAssets ? null, ... }:
+{ pkgs, lib ? null, colors ? null, privatePackages ? {}, ... }:
 
 {
   lyrics = pkgs.callPackage ./lyrics { };
@@ -7,9 +7,7 @@
   claude-desktop = pkgs.callPackage ./claude-desktop { };
   jcode = pkgs.callPackage ./jcode { };
   windows-overview = pkgs.callPackage ./windows-overview { };
-  workspace-icons = pkgs.callPackage ./workspace-icons (
-    if privateAssets == null then { } else { iconDir = "${privateAssets}/workspace-icons"; }
-  );
+  material-symbols-filled = pkgs.callPackage ./material-symbols-filled.nix { };
   spacedrive-v2 = pkgs.callPackage ./spacedrive-v2 { };
   inherit (pkgs.callPackage ./device-mount.nix { }) device-mount device-umount;
 } // privatePackages

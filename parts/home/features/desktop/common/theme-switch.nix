@@ -36,7 +36,7 @@ let
         "$base/activate"
       fi
 
-      # Alacritty and waybar (a systemd unit) pick up the change by themselves.
+      # Alacritty picks up the change by itself.
       swaymsg reload >/dev/null 2>&1 || true
       makoctl reload >/dev/null 2>&1 || true
     '';

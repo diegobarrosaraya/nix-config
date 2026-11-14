@@ -92,7 +92,7 @@
       flake = true;
     };
 
-    # Licensed assets (Font Awesome Pro icons), not for the public repo.
+    # Licensed assets (wallpapers and the like), not for the public repo. Not used for fonts.
     private-assets = {
       url = "git+ssh://git@github.com/diegobarrosaraya/private-assets.git";
       flake = false;
