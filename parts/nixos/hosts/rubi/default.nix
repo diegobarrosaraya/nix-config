@@ -17,7 +17,7 @@
     global
     users-diego
 
-    inputs.hardware.nixosModules.common-cpu-intel
+    inputs.hardware.nixosModules.common-cpu-amd-pstate
     inputs.hardware.nixosModules.common-pc-ssd
     rubi-hardware-configuration
 
@@ -179,6 +179,16 @@
     AMD_VULKAN_ICD = "RADV";
   };
 
+  # Ardour shows a blocking dialog at startup when memlock is limited.
+  security.pam.loginLimits = [
+    {
+      domain = "@audio";
+      item = "memlock";
+      type = "-";
+      value = "unlimited";
+    }
+  ];
+
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -217,15 +227,13 @@
   };
 
   # geoclue2 disabled: only consumer was localtimed (auto timezone-by-location),
-  # which is useless without it. Waybar's location-clock module reads
-  # /etc/localtime directly, not geoclue.
+  # which is useless without it.
 
   services.logind.settings.Login = {
     HandleLidSwitch = "ignore";
     HandleLidSwitchDocked = "ignore";
   };
   services.power-profiles-daemon.enable = true;
-  services.thermald.enable = true;
 
   hardware.brillo.enable = true;
 
@@ -248,6 +256,12 @@
   };
 
   programs.nix-ld.enable = true;
+
+  # The 680M's automatic clock stays at 200-400 MHz under the bursty load of the NX2navi
+  # port (measured 2026-11-10); pin it high. PCI path, since card0/card1 can swap between boots.
+  systemd.tmpfiles.rules = [
+    "w /sys/bus/pci/devices/0000:05:00.0/power_dpm_force_performance_level - - - - high"
+  ];
 
   home-manager = {
     backupFileExtension = "backup";
