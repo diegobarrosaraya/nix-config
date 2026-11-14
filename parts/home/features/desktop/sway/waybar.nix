@@ -210,6 +210,53 @@
         esac
       '';
 
+      # Audio-only meeting recorder: click once to name it and start, click again to stop.
+      # Records the default output monitor (them) and the default mic (me), mixed to one mono
+      # Opus track. The mic is level-normalised because Meet and other call apps leave it quiet.
+      meetingDir = "${config.xdg.userDirs.documents}/Meetings";
+
+      waybar-meeting-rec = pkgs.writeShellScriptBin "waybar-meeting-rec" ''
+        state="''${XDG_RUNTIME_DIR:-/tmp}/meeting-rec"
+        refresh() { pkill -RTMIN+8 waybar || true; }
+
+        if [ -f "$state" ] && kill -0 "$(head -n1 "$state")" 2>/dev/null; then
+          pid=$(head -n1 "$state")
+          file=$(tail -n1 "$state")
+          kill -INT "$pid"
+          # SIGINT lets ffmpeg close the Ogg file; wait so the icon flips only when it is done.
+          while kill -0 "$pid" 2>/dev/null; do sleep 0.2; done
+          rm -f "$state"
+          refresh
+          ${lib.getExe pkgs.libnotify} "Recording saved" "$file"
+          exit 0
+        fi
+
+        name=$(echo | ${config.launcher.dmenu} --require-match false --prompt-text "meeting name:")
+        [ -z "$name" ] && exit 0
+        slug=$(printf '%s' "$name" | tr -cs '[:alnum:]' '-' | sed 's/^-//; s/-$//')
+        [ -n "$slug" ] || slug=meeting
+
+        mkdir -p "${meetingDir}"
+        file="${meetingDir}/$(date +%F_%H%M)_$slug.ogg"
+
+        setsid ${lib.getExe pkgs.ffmpeg} -nostdin -loglevel error \
+          -f pulse -i @DEFAULT_MONITOR@ -f pulse -i @DEFAULT_SOURCE@ \
+          -filter_complex '[0]aformat=channel_layouts=mono[them];[1]aformat=channel_layouts=mono,highpass=f=100,dynaudnorm=f=150:g=15:m=12[me];[them][me]amix=inputs=2:normalize=0,alimiter=limit=0.9:level=0,aformat=channel_layouts=mono' \
+          -c:a libopus -b:a 32k -application voip "$file" &
+        printf '%s\n%s\n' "$!" "$file" > "$state"
+        refresh
+      '';
+
+      waybar-meeting-rec-status = pkgs.writeShellScriptBin "waybar-meeting-rec-status" ''
+        state="''${XDG_RUNTIME_DIR:-/tmp}/meeting-rec"
+        if [ -f "$state" ] && kill -0 "$(head -n1 "$state")" 2>/dev/null; then
+          ${lib.getExe pkgs.jq} -cn --arg t "${u "e061"}" --arg f "$(tail -n1 "$state")" \
+            '{text: $t, class: "recording", tooltip: "Recording: \($f)\nClick to stop"}'
+        else
+          printf '{"text":"%s","class":"idle","tooltip":"Record a meeting"}\n' "${u "e029"}"
+        fi
+      '';
+
       waybar-location-clock = pkgs.writeShellScriptBin "waybar-location-clock" ''
         set -eu
 
@@ -410,6 +457,14 @@
           exec = "${lib.getExe waybar-mic}";
           interval = 2;
           return-type = "json";
+        };
+
+        "custom/meeting-rec" = {
+          exec = "${lib.getExe waybar-meeting-rec-status}";
+          interval = 30;
+          signal = 8;
+          return-type = "json";
+          on-click = "${lib.getExe waybar-meeting-rec}";
         };
 
         "custom/jack" = {
@@ -654,6 +709,7 @@
             // {
               output = "!${laptop}";
               modules-right = [
+                "custom/meeting-rec"
                 "custom/mic"
                 "mpris"
                 "custom/sep"
@@ -677,6 +733,7 @@
             // {
               output = laptop;
               modules-right = [
+                "custom/meeting-rec"
                 "custom/mic"
                 "disk"
                 "cpu"
@@ -856,6 +913,7 @@
           #custom-syncthing,
           #custom-jocalsend-icon,
           #custom-droidcam-icon,
+          #custom-meeting-rec,
           #custom-scratchpad {
             padding: 0 12px;
             color: #${colors.base07};
@@ -869,10 +927,19 @@
           #custom-syncthing,
           #custom-jocalsend-icon,
           #custom-droidcam-icon,
+          #custom-meeting-rec,
           #custom-scratchpad,
           #idle_inhibitor,
           #power-profiles-daemon {
             font-family: "Material Symbols Filled";
+          }
+
+          #custom-meeting-rec.idle {
+            color: #${colors.base03};
+          }
+
+          #custom-meeting-rec.recording {
+            color: #${colors.base08};
           }
 
           #custom-scratchpad.empty {
@@ -987,6 +1054,8 @@
         waybar-jocalsend
         waybar-droidcam-icon
         waybar-droidcam
+        waybar-meeting-rec
+        waybar-meeting-rec-status
         waybar-location-clock
         waybar-scratchpad
       ];
