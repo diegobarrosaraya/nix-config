@@ -20,6 +20,17 @@
     {
       home.file = litellmFree.pi;
 
+      programs.eilmeldung = {
+        enable = true;
+        settings.login_setup = {
+          login_type = "direct_password";
+          provider = "miniflux";
+          url = "https://rss.minerales.network";
+          user = "admin";
+          password = "cmd:cat /run/secrets/miniflux-password";
+        };
+      };
+
       custom.git.signingKey = "~/.ssh/keys/git_ed25519.pub";
 
       colorscheme.mode = "dark";

@@ -54,6 +54,13 @@ with lib;
       mode = "0400";
     };
 
+    # Password of the Miniflux admin user (same value as in cobalto's miniflux-admin), read by eilmeldung.
+    secrets."miniflux-password" = {
+      owner = "diego";
+      group = "users";
+      mode = "0400";
+    };
+
     secrets."groq-api-key" = {
       owner = "diego";
       group = "users";
