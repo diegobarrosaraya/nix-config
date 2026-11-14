@@ -36,6 +36,26 @@ lib.mkIf enableKanshi {
         ];
       }
 
+      # Laptop panel and Samsung together, as set up by hand on 2026-11-06.
+      # Must come before partial-samsung, which matches the same two outputs.
+      {
+        profile.name = "laptop-samsung";
+        profile.outputs = [
+          {
+            criteria = "Lenovo Group Limited 0x403C Unknown";
+            mode = "2240x1400@60Hz";
+            position = "0,153";
+            scale = 1.5;
+          }
+          {
+            criteria = "Samsung Electric Company LS27A600U *";
+            mode = "2560x1440@75Hz";
+            position = "1493,0";
+            scale = 1.0;
+          }
+        ];
+      }
+
       # Unplugging the dock drops the monitors one at a time. Without these,
       # the half-unplugged state matches nothing and eDP-1 stays disabled.
       {
