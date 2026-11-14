@@ -97,7 +97,7 @@
           "Mod4+Shift+r          rename workspace" \
           "Mod4+Shift+d          display mode picker" \
           "Mod4+Ctrl+1/2/3       display mode: single/docked/triple" \
-          "Mod4+Ctrl+Left/Right  move workspace to adjacent output" \
+          "Mod4+Ctrl+Left/Right  swap workspaces with the other output" \
           "Mod4+minus            show scratchpad" \
           "Mod4+Shift+minus      send to scratchpad" \
           "Mod4+Shift+s          screenshot (region, gui)" \
@@ -180,21 +180,17 @@
             #!/usr/bin/env bash
             set -euo pipefail
 
-            DIRECTION="''${1:-}"
-            case "$DIRECTION" in
-              left|right) ;;
-              *)
-                echo "Usage: swap-workspace-output left|right" >&2
-                exit 1
-                ;;
-            esac
-
             CUR_OUT=$(swaymsg -t get_outputs | ${pkgs.jq}/bin/jq -r '.[] | select(.focused) | .name')
             CUR_WS=$(swaymsg -t get_outputs | ${pkgs.jq}/bin/jq -r '.[] | select(.focused) | .current_workspace // empty')
 
             [ -n "$CUR_WS" ] || exit 0
 
-            swaymsg focus output "$DIRECTION" >/dev/null
+            # Next active output in sway's list, wrapping. On two monitors this
+            # is the other one, whatever the physical arrangement.
+            NEXT_OUT=$(swaymsg -t get_outputs | ${pkgs.jq}/bin/jq -r --arg cur "$CUR_OUT" '
+              [.[] | select(.active) | .name] as $n
+              | $n[(($n | index($cur)) + 1) % ($n | length)]')
+            swaymsg focus output "$NEXT_OUT" >/dev/null
             ADJ_OUT=$(swaymsg -t get_outputs | ${pkgs.jq}/bin/jq -r '.[] | select(.focused) | .name')
             ADJ_WS=$(swaymsg -t get_outputs | ${pkgs.jq}/bin/jq -r '.[] | select(.focused) | .current_workspace // empty')
 
@@ -575,8 +571,8 @@
               "Mod4+Ctrl+2" = "exec kanshi-switch docked";
               "Mod4+Ctrl+3" = "exec kanshi-switch triple";
 
-              "Mod4+Ctrl+Left" = "exec swap-workspace-output left";
-              "Mod4+Ctrl+Right" = "exec swap-workspace-output right";
+              "Mod4+Ctrl+Left" = "exec swap-workspace-output";
+              "Mod4+Ctrl+Right" = "exec swap-workspace-output";
 
               "Mod4+Ctrl+equal" = "gaps inner current plus 4";
               "Mod4+Ctrl+minus" = "gaps inner current minus 4";
