@@ -10,5 +10,6 @@
   material-symbols-filled = pkgs.callPackage ./material-symbols-filled.nix { };
   spacedrive-v2 = pkgs.callPackage ./spacedrive-v2 { };
   orca = pkgs.callPackage ./orca { };
+  grok-bot = pkgs.callPackage ./grok-bot { };
   inherit (pkgs.callPackage ./device-mount.nix { }) device-mount device-umount;
 } // privatePackages

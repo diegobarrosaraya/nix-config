@@ -58,6 +58,7 @@
         customPkgs.coderabbit-cli
         customPkgs.ekphos
         customPkgs.orca
+        customPkgs.grok-bot
         pkgs.zennotes-desktop
         customPkgs.zennotes-cli
         pkgs.insync
