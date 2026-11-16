@@ -57,6 +57,7 @@
       home.packages = [
         customPkgs.coderabbit-cli
         customPkgs.ekphos
+        customPkgs.orca
         pkgs.zennotes-desktop
         customPkgs.zennotes-cli
         pkgs.insync

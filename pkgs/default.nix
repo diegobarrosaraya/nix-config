@@ -9,5 +9,6 @@
   windows-overview = pkgs.callPackage ./windows-overview { };
   material-symbols-filled = pkgs.callPackage ./material-symbols-filled.nix { };
   spacedrive-v2 = pkgs.callPackage ./spacedrive-v2 { };
+  orca = pkgs.callPackage ./orca { };
   inherit (pkgs.callPackage ./device-mount.nix { }) device-mount device-umount;
 } // privatePackages
