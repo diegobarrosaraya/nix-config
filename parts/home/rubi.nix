@@ -36,7 +36,7 @@
       colorscheme.mode = "dark";
       colorscheme.type = "colors";
       colorscheme.iconFolderColor = "black";
-      # The base is dark; `theme` and darkman switch to this one and back.
+      # The base is dark; `theme light|dark|toggle` switches to this one and back.
       colorscheme.specialisations.light = {
         type = "colors-light";
         mode = "light";
@@ -50,6 +50,7 @@
         cli-zathura
         desktop-common
         desktop-sway
+        desktop-yami
         desktop-zennotes-theme
         ai
       ];

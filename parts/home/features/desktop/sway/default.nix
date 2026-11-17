@@ -273,9 +273,13 @@
 
       config = {
 
+        # yami's niri config spawns its own wl-paste watchers. This unit is
+        # sway-session.target, which sway's systemd integration starts (on by
+        # default) and niri does not.
         services.cliphist = {
           enable = true;
           allowImages = true;
+          systemdTargets = [ "sway-session.target" ];
         };
 
         home.packages = with pkgs; [
@@ -306,12 +310,13 @@
           screencast-idle-inhibit
         ];
 
-        xdg.configFile."environment.d/xdg.conf".text = ''
-          XDG_SESSION_TYPE=wayland
-          XDG_CURRENT_DESKTOP=sway
-        '';
+        # environment.d applies to every session of this user. Portals pick
+        # their config from XDG_CURRENT_DESKTOP, so a sway value here sends
+        # niri to xdg.portal.config.sway. sway's own startup below sets it
+        # for the sway session; niri's desktop entry sets niri.
 
-        # Flameshot service (must run as daemon on Wayland)
+        # Flameshot service (must run as daemon on Wayland). The module
+        # binds it to graphical-session.target, which niri also reaches.
         services.flameshot = {
           enable = true;
           settings = {
@@ -319,6 +324,14 @@
               showStartupLaunchMessage = false;
             };
           };
+        };
+        systemd.user.services.flameshot = {
+          Unit.PartOf = lib.mkForce [ "sway-session.target" ];
+          Unit.After = lib.mkForce [
+            "sway-session.target"
+            "tray.target"
+          ];
+          Install.WantedBy = lib.mkForce [ "sway-session.target" ];
         };
 
         # swayr's picker menu, pointed at fuzzel instead of its wofi default.
@@ -456,6 +469,11 @@
             };
 
             startup = [
+              # mako has no D-Bus activation file on PATH (see mako.nix), so
+              # sway has to start it. playerctld the same (see playerctl.nix):
+              # yami is the notification server and the MPRIS client on niri.
+              { command = "${pkgs.mako}/bin/mako"; }
+              { command = "${pkgs.playerctl}/bin/playerctld"; }
 
               {
                 command = "swayidle -w timeout 300 'swaylock -f' timeout 600 'swaymsg \"output * power off\"' resume 'swaymsg \"output * power on\"' before-sleep 'swaylock -f'";

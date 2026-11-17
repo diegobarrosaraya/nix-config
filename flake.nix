@@ -22,6 +22,13 @@
 
     stylix.url = "github:danth/stylix";
 
+    # Pinned release. nixpkgs follows this flake so the shell builds against the
+    # same niri the NixOS module enables (stock nixpkgs, not yami's patched fork).
+    yami = {
+      url = "github:Trendorin/yami/v3.0.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     vital-presets = {
       url = "github:Miserlou/VitalPresets";
       flake = false;
