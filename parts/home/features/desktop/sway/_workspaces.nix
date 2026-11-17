@@ -61,9 +61,9 @@ let
     };
     "Web" = {
       icon = "e87a";
-      app = "zen-beta";
+      app = "zen";
       key = "f";
-      launch = "zen-beta";
+      launch = "zen";
       persistent = true;
       autostart = 2;
     };

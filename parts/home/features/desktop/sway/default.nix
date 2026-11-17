@@ -16,9 +16,9 @@
       workspaces = {
         "1" = {
           name = "Web";
-          app = "zen-beta";
+          app = "zen";
           key = "f";
-          launch = "zen-beta";
+          launch = "zen";
         };
         "2" = {
           name = "Files";

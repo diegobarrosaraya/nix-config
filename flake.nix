@@ -27,8 +27,11 @@
       flake = false;
     };
 
+    # /beta tracks Zen's stable releases (tags like 1.24.2b). The default
+    # branch also moves on twilight pre-releases. The module is still
+    # homeModules.beta: that is the name the flake uses for the stable build.
     zen-browser = {
-      url = "github:0xc000022070/zen-browser-flake";
+      url = "github:0xc000022070/zen-browser-flake/beta";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
@@ -90,12 +93,6 @@
 
       url = "git+ssh://git@github.com/diegobarrosaraya/nix-private-config.git";
       flake = true;
-    };
-
-    # Licensed assets (wallpapers and the like), not for the public repo. Not used for fonts.
-    private-assets = {
-      url = "git+ssh://git@github.com/diegobarrosaraya/private-assets.git";
-      flake = false;
     };
 
     # zennotes-server lives here now. No flake, but its default.nix takes pkgs.
