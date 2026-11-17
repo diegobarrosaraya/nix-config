@@ -73,6 +73,22 @@
       };
     };
 
+    # autoPatchelf sets the interpreter before the rpath on the bundled node, and ld.so then
+    # segfaults in dl_main (even for `node --version`; patchelf 0.19 and 0.18 both do it). The other
+    # order works, so patch node by hand and keep it away from autoPatchelf.
+    # shortcut: drop once nixpkgs' cursor-cli node runs unpatched by this override.
+    cursor-cli = prev.cursor-cli.overrideAttrs (old: {
+      dontAutoPatchelf = true;
+      postFixup = (old.postFixup or "") + ''
+        dir=$out/share/cursor-agent
+        patchelf --set-rpath "${final.lib.makeLibraryPath [ final.stdenv.cc.cc.lib final.zlib ]}" $dir/node
+        patchelf --set-interpreter "$(cat $NIX_BINTOOLS/nix-support/dynamic-linker)" $dir/node
+        mv $dir/node $NIX_BUILD_TOP/node
+        autoPatchelf $dir
+        mv $NIX_BUILD_TOP/node $dir/node
+      '';
+    });
+
     xdg-desktop-portal-wlr = prev.xdg-desktop-portal-wlr.overrideAttrs (_oldAttrs: {
       version = "0.8.4";
       src = final.fetchFromGitHub {
