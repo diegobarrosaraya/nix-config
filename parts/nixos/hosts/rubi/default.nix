@@ -199,9 +199,10 @@
     extraConfig.pipewire."92-low-latency" = {
       "context.properties" = {
         "default.clock.rate" = 48000;
-        "default.clock.quantum" = 64;
-        "default.clock.min-quantum" = 32;
-        "default.clock.max-quantum" = 512;
+        # 64 caused xruns (glitch noise in mpd) under CPU load
+        "default.clock.quantum" = 256;
+        "default.clock.min-quantum" = 256;
+        "default.clock.max-quantum" = 1024;
       };
     };
 
