@@ -2,7 +2,7 @@
 {
   # One ZenNotes theme with rubi's two schemes: colors-light under :root and
   # colors under [data-theme-mode="dark"]. With theme_mode "auto" the app
-  # follows the system setting, which darkman switches. Fonts come from
+  # follows the system setting, which `theme` switches. Fonts come from
   # config.toml (interface_font, text_font, mono_font), not from the theme.
   flake.modules.homeManager.desktop-zennotes-theme =
 { config, lib, pkgs, inputs, ... }:

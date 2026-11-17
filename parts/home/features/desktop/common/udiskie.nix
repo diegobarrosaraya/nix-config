@@ -9,18 +9,19 @@
       tray: false
   '';
 
+  # yami-agents mounts disks in the niri session. udiskie stays for sway.
   systemd.user.services.udiskie = {
     Unit = {
       Description = "udiskie automounter";
-      After = [ "graphical-session.target" ];
-      PartOf = [ "graphical-session.target" ];
+      After = [ "sway-session.target" ];
+      PartOf = [ "sway-session.target" ];
     };
     Service = {
       ExecStart = "${pkgs.udiskie}/bin/udiskie";
       Restart = "on-failure";
     };
     Install = {
-      WantedBy = [ "graphical-session.target" ];
+      WantedBy = [ "sway-session.target" ];
     };
   };
 };}

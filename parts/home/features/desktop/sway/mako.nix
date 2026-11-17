@@ -1,14 +1,25 @@
 { ... }:
 {
   flake.modules.homeManager.desktop-sway-mako =
-{ config, ... }:
+{ config, pkgs, ... }:
 let
   inherit (config.colorscheme) colors;
   inherit (config.stylix) fonts;
+  # mako's D-Bus service is Name=org.freedesktop.Notifications. In the user
+  # profile it would start mako under niri and take the name from yami.
+  # package = null keeps this config and skips home-manager's dbus.packages
+  # link; the bin-only package is what actually lands on PATH. sway starts
+  # the daemon itself.
+  mako = pkgs.runCommand "mako-bin" { } ''
+    mkdir -p $out/bin
+    ln -s ${pkgs.mako}/bin/mako $out/bin/mako
+    ln -s ${pkgs.mako}/bin/makoctl $out/bin/makoctl
+  '';
 in
 {
   services.mako = {
     enable = true;
+    package = null;
     settings = {
       font = "${fonts.sansSerif.name} 14";
       max-visible = 5;
@@ -65,5 +76,7 @@ in
       };
     };
   };
+
+  home.packages = [ mako ];
 };
 }

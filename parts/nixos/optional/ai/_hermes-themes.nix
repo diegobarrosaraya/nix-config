@@ -45,7 +45,7 @@ let
   light = hex pair.light;
 
   # Dashboard: one theme that follows the browser's prefers-color-scheme, so
-  # it switches with darkman on rubi (GTK color-scheme) and with the OS
+  # it switches with `theme` on rubi (GTK color-scheme) and with the OS
   # elsewhere. The YAML carries the dark values; the dashboard sets them as
   # inline styles on <html>, so the light block needs !important to win.
   # The palette triplet drives every derived token; overrides pin the accents.

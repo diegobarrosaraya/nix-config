@@ -2,8 +2,9 @@
 {
   # Light/dark switching on top of colorscheme.specialisations. Stylix themes at
   # build time, so a switch activates the other home-manager specialisation.
-  # `theme light|dark|toggle` does it by hand; darkman does it at sunrise and
-  # sunset. The choice is kept in ~/.local/state/theme.
+  # `theme light|dark|toggle` does it by hand. The choice is kept in
+  # ~/.local/state/theme. yami watches shell.json and picks the new palette up
+  # from that activation; swaymsg and makoctl are for the sway fallback.
   flake.modules.homeManager.desktop-common-theme-switch =
 { config, lib, pkgs, ... }:
 let
@@ -56,17 +57,5 @@ lib.mkIf (config.colorscheme.specialisations != { }) {
       fi
     ''
   );
-
-  services.darkman = {
-    enable = true;
-    # Santiago. Geoclue is off on rubi (see its host config), so fixed coordinates.
-    settings = {
-      lat = -33.45;
-      lng = -70.67;
-      usegeoclue = false;
-    };
-    darkModeScripts.theme = "${lib.getExe theme} dark";
-    lightModeScripts.theme = "${lib.getExe theme} light";
-  };
 };
 }

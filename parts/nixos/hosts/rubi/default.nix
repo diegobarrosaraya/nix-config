@@ -44,9 +44,10 @@
     # the old /run/current-system/sw store path.
     { imports = [ { imports = [ inputs.private-config.nixosModules.work ]; } ]; }
 
-    # replaces hosts/common/optional/desktop/select.nix for desktop = "sway";
-    # kept last so its definitions merge in the same order as before.
+    # sway stays installed as a fallback session. yami comes after it so its
+    # greetd command (mkForce) wins, and systemPackages keep the old merge order.
     desktop-environments-sway
+    desktop-environments-yami
   ];
 
   console = {

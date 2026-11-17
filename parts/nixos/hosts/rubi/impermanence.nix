@@ -38,6 +38,22 @@
 
       "/var/lib/lockdown"
 
+      # yami-greet reads these before login. look/ is the palette, font and
+      # wallpaper the shell published; state/ is the last user and session.
+      # The parent /var/lib/yami-greet is recreated by tmpfiles each boot.
+      {
+        directory = "/var/lib/yami-greet/look";
+        user = "diego";
+        group = "users";
+        mode = "0755";
+      }
+      {
+        directory = "/var/lib/yami-greet/state";
+        user = "greeter";
+        group = "greeter";
+        mode = "0700";
+      }
+
       {
         directory = "/home/diego";
         user = "diego";
