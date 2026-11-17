@@ -101,6 +101,16 @@
           # (unknown names are dropped, missing key means all of them).
           themeApps = [ ];
           browserMenus = false;
+          # The built-in terminal bind is `spawn "kitty"`. settings.binds only
+          # changes the key, so "" drops it and a custom bind takes Mod+T.
+          # This list is rewritten on every activation.
+          binds.terminal = "";
+          customBinds = [
+            {
+              key = "Mod+T";
+              cmd = "alacritty";
+            }
+          ];
         };
       };
 

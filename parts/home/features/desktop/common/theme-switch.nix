@@ -6,8 +6,18 @@
   # ~/.local/state/theme. yami watches shell.json and picks the new palette up
   # from that activation; swaymsg and makoctl are for the sway fallback.
   flake.modules.homeManager.desktop-common-theme-switch =
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, options, ... }:
 let
+  # The base generation is dark. Its yami activation merges dark colors into
+  # shell.json. Restoring a saved light theme runs the light specialisation,
+  # which merges the light colors. That has to happen after the dark merge,
+  # or the base activation writes dark back on top. "yami" is only a real
+  # activation entry when the module is imported.
+  yamiActivation =
+    let
+      present = builtins.tryEval options.programs.yami.enable.isDefined;
+    in
+    lib.optional (present.success && present.value && config.programs.yami.enable) "yami";
   state = "${config.xdg.stateHome}/theme";
 
   theme = pkgs.writeShellApplication {
@@ -49,7 +59,15 @@ lib.mkIf (config.colorscheme.specialisations != { }) {
   # A rebuild activates the base generation and would drop a light choice.
   # Only the base has specialisations, so this never runs inside one.
   home.activation.applySavedTheme = lib.mkIf (config.specialisation != { }) (
-    lib.hm.dag.entryAfter [ "writeBoundary" "linkGeneration" "onFilesChange" "reloadSystemd" ] ''
+    lib.hm.dag.entryAfter (
+      [
+        "writeBoundary"
+        "linkGeneration"
+        "onFilesChange"
+        "reloadSystemd"
+      ]
+      ++ yamiActivation
+    ) ''
       saved=$(cat ${state} 2>/dev/null || true)
       if [ -n "$saved" ] && [ "$saved" != ${config.colorscheme.mode} ] \
         && [ -x "$newGenPath/specialisation/$saved/activate" ]; then
