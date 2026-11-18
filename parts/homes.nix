@@ -53,7 +53,7 @@ in
     "diego@rubi" = mkHome {
       entrypoint = config.flake.modules.homeManager.rubi;
       extraModules = [ inputs.private-config.homeManagerModules.workExtras ];
-      desktop = "yami";
+      desktop = "sway";
     };
   };
 }

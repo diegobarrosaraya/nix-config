@@ -273,9 +273,7 @@
 
       config = {
 
-        # yami's niri config spawns its own wl-paste watchers. This unit is
-        # sway-session.target, which sway's systemd integration starts (on by
-        # default) and niri does not.
+        # Clipboard history on sway-session.target (sway's systemd integration).
         services.cliphist = {
           enable = true;
           allowImages = true;
@@ -310,13 +308,7 @@
           screencast-idle-inhibit
         ];
 
-        # environment.d applies to every session of this user. Portals pick
-        # their config from XDG_CURRENT_DESKTOP, so a sway value here sends
-        # niri to xdg.portal.config.sway. sway's own startup below sets it
-        # for the sway session; niri's desktop entry sets niri.
-
-        # Flameshot service (must run as daemon on Wayland). The module
-        # binds it to graphical-session.target, which niri also reaches.
+        # Flameshot (Wayland daemon). Forced onto sway-session.target below.
         services.flameshot = {
           enable = true;
           settings = {
@@ -469,11 +461,7 @@
             };
 
             startup = [
-              # mako has no D-Bus activation file on PATH (see mako.nix), so
-              # sway has to start it. playerctld the same (see playerctl.nix):
-              # yami is the notification server and the MPRIS client on niri.
               { command = "${pkgs.mako}/bin/mako"; }
-              { command = "${pkgs.playerctl}/bin/playerctld"; }
 
               {
                 command = "swayidle -w timeout 300 'swaylock -f' timeout 600 'swaymsg \"output * power off\"' resume 'swaymsg \"output * power on\"' before-sleep 'swaylock -f'";

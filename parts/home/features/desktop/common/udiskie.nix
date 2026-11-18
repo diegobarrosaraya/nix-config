@@ -9,7 +9,7 @@
       tray: false
   '';
 
-  # yami-agents mounts disks in the niri session. udiskie stays for sway.
+  # Automount on sway-session.target.
   systemd.user.services.udiskie = {
     Unit = {
       Description = "udiskie automounter";
