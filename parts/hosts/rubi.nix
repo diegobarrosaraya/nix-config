@@ -11,7 +11,7 @@
       self = inputs.self;
       outputs = inputs.self;
       customPkgs = config.flake.packages.x86_64-linux;
-      desktop = "yami";
+      desktop = "sway";
       theme = null;
     };
   };

@@ -50,7 +50,6 @@
         cli-zathura
         desktop-common
         desktop-sway
-        desktop-yami
         desktop-zennotes-theme
         ai
       ];

@@ -44,10 +44,7 @@
     # the old /run/current-system/sw store path.
     { imports = [ { imports = [ inputs.private-config.nixosModules.work ]; } ]; }
 
-    # sway stays installed as a fallback session. yami comes after it so its
-    # greetd command (mkForce) wins, and systemPackages keep the old merge order.
     desktop-environments-sway
-    desktop-environments-yami
   ];
 
   console = {
