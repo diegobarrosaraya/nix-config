@@ -73,7 +73,7 @@ in
         color-scheme = lib.mkDefault (
           if config.colorscheme.mode == "light" then "prefer-light" else "prefer-dark"
         );
-      } // lib.optionalAttrs (desktop == "sway" || desktop == "yami") {
+      } // lib.optionalAttrs (desktop == "sway") {
         cursor-theme = config.stylix.cursor.name;
       };
     })

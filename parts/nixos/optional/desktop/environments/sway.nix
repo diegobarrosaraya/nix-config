@@ -24,9 +24,7 @@
   boot.extraModprobeConfig = ''
     options v4l2loopback video_nr=9 card_label="DroidCam" exclusive_caps=1
   '';
-  # tuigreet, and only sway's session. rubi replaces the command with yami-greet
-  # (mkForce in desktop-environments-yami) and points XDG_DATA_DIRS at every
-  # session NixOS installed, so sway stays selectable at login.
+  # tuigreet with sway's wayland session.
   services.greetd = {
     enable = true;
     settings = {

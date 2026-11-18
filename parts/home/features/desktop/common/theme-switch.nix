@@ -3,8 +3,8 @@
   # Light/dark switching on top of colorscheme.specialisations. Stylix themes at
   # build time, so a switch activates the other home-manager specialisation.
   # `theme light|dark|toggle` does it by hand. The choice is kept in
-  # ~/.local/state/theme. yami watches shell.json and picks the new palette up
-  # from that activation; swaymsg and makoctl are for the sway fallback.
+  # ~/.local/state/theme. After activation, swaymsg and makoctl refresh the
+  # running sway session.
   flake.modules.homeManager.desktop-common-theme-switch =
 { config, lib, pkgs, ... }:
 let
